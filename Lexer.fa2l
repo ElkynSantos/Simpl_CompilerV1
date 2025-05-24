@@ -1,0 +1,52 @@
+#include <iostream>
+#include <string>
+#include <stdexcept>
+#include "tokens.hpp"
+#include "SimplLexer.hpp"
+
+int SimplLexer::getNextChar() {
+    if (pos < input.length()) {
+        int ch = input[pos];
+        pos++;
+
+        return ch;
+    } else {
+        return -1;
+    }
+}
+
+void SimplLexer::ungetChar(int ch) {
+    if (pos > 0 && pos < input.length()) {
+        pos --;
+    }
+}
+
+void SimplLexer::reportError(int ch) {
+    throw std::runtime_error(std::string("Invalid character '")
+            + static_cast<char>(ch) + "'");
+}
+
+/*!fa2lexer
+    %option generate.tokens = true;
+
+    %file "SimplDFA/EOF.jff" name "EOF";
+    %file "SimplDFA/Number.jff" name "Number";
+    %file "SimplDFA/Ident.jff" name "Ident";
+
+    %generate.state_enum(State);
+*/
+
+Token SimplLexer::getNextToken() {
+    text.clear();
+
+    /*!fa2lexer
+     %generate.lexer (text);
+     */
+}
+
+std::string SimplLexer::tokenToString(Token tk)
+{
+   /*!fa2lexer
+   %generate.toString (tk);
+   */
+}
