@@ -14,7 +14,12 @@ int main(){
     /
     /9
     /a
-    asda dada 
+    /**/
+    asda dada
+    +
+    -
+    *
+    %
     )";
     
     SimplLexer lexer(input);

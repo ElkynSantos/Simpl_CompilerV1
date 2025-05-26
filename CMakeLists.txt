@@ -14,7 +14,10 @@ add_custom_command (
           ${PROJECT_SOURCE_DIR}/SimplDFA/Number.jff
           ${PROJECT_SOURCE_DIR}/SimplDFA/Ident.jff
           ${PROJECT_SOURCE_DIR}/SimplDFA/Division_And_Comments.jff
-
+          ${PROJECT_SOURCE_DIR}/SimplDFA/Addition.jff
+          ${PROJECT_SOURCE_DIR}/SimplDFA/Multiplication.jff
+          ${PROJECT_SOURCE_DIR}/SimplDFA/Subtraction.jff
+          ${PROJECT_SOURCE_DIR}/SimplDFA/Module.jff
 )
 set(CMAKE_BUILD_TYPE Debug)
 
