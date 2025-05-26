@@ -6,7 +6,15 @@
 int main(){
     std::string input = R"( 
     987 assd
-    identi fic ador 123123
+    /* iden
+    ti fica 92231313dsadsa 
+      */ 
+    ador 123123
+    // this is a comment
+    /
+    /9
+    /a
+    asda dada 
     )";
     
     SimplLexer lexer(input);

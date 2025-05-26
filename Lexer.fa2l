@@ -32,6 +32,7 @@ void SimplLexer::reportError(int ch) {
     %file "SimplDFA/EOF.jff" name "EOF";
     %file "SimplDFA/Number.jff" name "Number";
     %file "SimplDFA/Ident.jff" name "Ident";
+    %file "SimplDFA/Division_And_Comments.jff" name "Division_And_Comments";
 
     %generate.state_enum(State);
 */

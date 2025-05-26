@@ -13,6 +13,7 @@ add_custom_command (
   DEPENDS ${PROJECT_SOURCE_DIR}/SimplDFA/EOF.jff
           ${PROJECT_SOURCE_DIR}/SimplDFA/Number.jff
           ${PROJECT_SOURCE_DIR}/SimplDFA/Ident.jff
+          ${PROJECT_SOURCE_DIR}/SimplDFA/Division_And_Comments.jff
 
 )
 set(CMAKE_BUILD_TYPE Debug)
