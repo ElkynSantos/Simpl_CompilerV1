@@ -18,6 +18,11 @@ add_custom_command (
           ${PROJECT_SOURCE_DIR}/SimplDFA/Multiplication.jff
           ${PROJECT_SOURCE_DIR}/SimplDFA/Subtraction.jff
           ${PROJECT_SOURCE_DIR}/SimplDFA/Module.jff
+          ${PROJECT_SOURCE_DIR}/SimplDFA/Equal_And_Assignment.jff
+          ${PROJECT_SOURCE_DIR}/SimplDFA/GreaterThanOrEqualTo.jff
+          ${PROJECT_SOURCE_DIR}/SimplDFA/LessThanOrEqualTo.jff
+          ${PROJECT_SOURCE_DIR}/SimplDFA/NotEqual.jff
+        
 )
 set(CMAKE_BUILD_TYPE Debug)
 

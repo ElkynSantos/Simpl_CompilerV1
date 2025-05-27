@@ -20,6 +20,12 @@ int main(){
     -
     *
     %
+    ==
+    !=
+    =
+    >=>
+    <=
+    <
     )";
     
     SimplLexer lexer(input);

@@ -37,7 +37,10 @@ void SimplLexer::reportError(int ch) {
     %file "SimplDFA/Subtraction.jff" name "Subtraction";
     %file "SimplDFA/Multiplication.jff" name "Multiplication";
     %file "SimplDFA/Module.jff" name "Module";
-
+    %file "SimplDFA/Equal_And_Assignment.jff" name "Equal_And_Assignment";
+    %file "SimplDFA/GreaterThanOrEqualTo.jff" name "GreaterThanOrEqualTo";
+    %file "SimplDFA/LessThanOrEqualTo.jff" name "LessThanOrEqualTo";
+    %file "SimplDFA/NotEqual.jff" name "NotEqual";
 
     %generate.state_enum(State);
 */
