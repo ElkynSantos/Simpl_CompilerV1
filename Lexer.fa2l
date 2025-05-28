@@ -87,7 +87,6 @@ void SimplLexer::initKeywords() {
 }
 
 std::optional<Token> SimplLexer :: keywordToken(const std::string& text) {
-
     auto Token = keywords.find(text);
     if (Token != keywords.end()) {
         return Token->second;

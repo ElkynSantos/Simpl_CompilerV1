@@ -4,7 +4,6 @@ project (SimplCompiler)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Run FA2LEXER to generate the lexer
 add_custom_command (
   OUTPUT SimplLexer.cpp tokens.hpp
   COMMAND fa2lexer --src SimplLexer.cpp --hdr tokens.hpp --tpl ${PROJECT_SOURCE_DIR}/Lexer.fa2l
