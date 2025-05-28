@@ -33,7 +33,7 @@ int main(){
     while
     true
     false
-    int
+    int fn let
     )";
     
     SimplLexer lexer(input);

@@ -52,7 +52,9 @@ void SimplLexer::reportError(int ch) {
         KwWhile = "keyword while",
         KwTrue = "keyword true",
         KwFalse = "keyword false",
-        KwInt = "keyword int"
+        KwInt = "keyword int",
+        KwLet = "Keyword Let",
+        KwFn = "Keyword Fn"
     }
 
     %generate.state_enum(State);
@@ -80,7 +82,8 @@ void SimplLexer::initKeywords() {
     keywords["true"] = Token::KwTrue;
     keywords["false"] = Token::KwFalse;
     keywords["int"] = Token::KwInt;
-
+    keywords["let"] = Token::KwLet;
+    keywords["fn"] = Token::KwFn;
 }
 
 std::optional<Token> SimplLexer :: keywordToken(const std::string& text) {
