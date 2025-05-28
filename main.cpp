@@ -14,9 +14,10 @@ int main(){
     /
     /9
     /a
-    /**/
+    /* THIS IS A LINES  
+    13$#$#$#@$%$% COMMENT */
     asda dada
-    +
+    ++*-
     -
     *
     %
@@ -26,11 +27,19 @@ int main(){
     >=>
     <=
     <
+    x = x
+    if
+    else
+    while
+    true
+    false
+    int
     )";
     
     SimplLexer lexer(input);
 
     Token tk = lexer.getNextToken();
+
 
     while(tk != Token::Eof) {
         std::cout << lexer.tokenToString(tk) <<" : "<<lexer.text<< std::endl;

@@ -2,7 +2,9 @@
 #include <string>
 #include <stdexcept>
 #include "tokens.hpp"
+#include <optional>
 #include "SimplLexer.hpp"
+#include <unordered_map>
 
 int SimplLexer::getNextChar() {
     if (pos < input.length()) {
@@ -20,6 +22,8 @@ void SimplLexer::ungetChar(int ch) {
         pos --;
     }
 }
+
+
 
 void SimplLexer::reportError(int ch) {
     throw std::runtime_error(std::string("Invalid character '")
@@ -42,6 +46,15 @@ void SimplLexer::reportError(int ch) {
     %file "SimplDFA/LessThanOrEqualTo.jff" name "LessThanOrEqualTo";
     %file "SimplDFA/NotEqual.jff" name "NotEqual";
 
+    %token.descriptions {
+        KwIf = "keyword if",
+        KwElse = "keyword else",
+        KwWhile = "keyword while",
+        KwTrue = "keyword true",
+        KwFalse = "keyword false",
+        KwInt = "keyword int"
+    }
+
     %generate.state_enum(State);
 */
 
@@ -58,4 +71,23 @@ std::string SimplLexer::tokenToString(Token tk)
    /*!fa2lexer
    %generate.toString (tk);
    */
+}
+
+void SimplLexer::initKeywords() {
+    keywords["if"] = Token::KwIf;
+    keywords["else"] = Token::KwElse;
+    keywords["while"] = Token::KwWhile;
+    keywords["true"] = Token::KwTrue;
+    keywords["false"] = Token::KwFalse;
+    keywords["int"] = Token::KwInt;
+
+}
+
+std::optional<Token> SimplLexer :: keywordToken(const std::string& text) {
+
+    auto Token = keywords.find(text);
+    if (Token != keywords.end()) {
+        return Token->second;
+    }
+    return std::nullopt;
 }
