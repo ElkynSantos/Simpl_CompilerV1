@@ -13,17 +13,15 @@ int SimplLexer::getNextChar() {
 
         return ch;
     } else {
-        return -1;
+        return EOF;
     }
 }
 
 void SimplLexer::ungetChar(int ch) {
-    if (pos > 0 && pos < input.length()) {
+    if (pos > 0 && pos <= input.length() && ch != EOF) {
         pos --;
     }
 }
-
-
 
 void SimplLexer::reportError(int ch) {
     throw std::runtime_error(std::string("Invalid character '")
@@ -36,7 +34,6 @@ void SimplLexer::reportError(int ch) {
     %file "SimplDFA/EOF.jff" name "EOF";
     %file "SimplDFA/Number.jff" name "Number";
     %file "SimplDFA/Ident.jff" name "Ident";
-    %file "SimplDFA/Division_And_Comments.jff" name "Division_And_Comments";
     %file "SimplDFA/Addition.jff" name "Addition";
     %file "SimplDFA/Subtraction.jff" name "Subtraction";
     %file "SimplDFA/Multiplication.jff" name "Multiplication";
@@ -45,6 +42,8 @@ void SimplLexer::reportError(int ch) {
     %file "SimplDFA/GreaterThanOrEqualTo.jff" name "GreaterThanOrEqualTo";
     %file "SimplDFA/LessThanOrEqualTo.jff" name "LessThanOrEqualTo";
     %file "SimplDFA/NotEqual.jff" name "NotEqual";
+    %file "SimplDFA/Delimiters.jff" name "Delimiters";
+    %file "SimplDFA/Division_And_Comments3.jff" name "Division_And_Comments3";
 
     %token.descriptions {
         KwIf = "keyword if",
@@ -53,8 +52,12 @@ void SimplLexer::reportError(int ch) {
         KwTrue = "keyword true",
         KwFalse = "keyword false",
         KwInt = "keyword int",
+        KwBool = "keyword Bool",
         KwLet = "Keyword Let",
-        KwFn = "Keyword Fn"
+        KwFn = "Keyword Fn",
+        kwAnd = "Keyword And",
+        KwOr = "Keyword Or",
+        KwNegation = "Keyword Negation"
     }
 
     %generate.state_enum(State);
@@ -83,7 +86,11 @@ void SimplLexer::initKeywords() {
     keywords["false"] = Token::KwFalse;
     keywords["int"] = Token::KwInt;
     keywords["let"] = Token::KwLet;
+    keywords["bool"] = Token::KwBool;
     keywords["fn"] = Token::KwFn;
+    keywords["and"] = Token::kwAnd;
+    keywords["or"] = Token::KwOr;
+    keywords["not"] = Token::KwNegation;
 }
 
 std::optional<Token> SimplLexer :: keywordToken(const std::string& text) {

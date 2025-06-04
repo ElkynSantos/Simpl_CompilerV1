@@ -1,4 +1,4 @@
- 987 assd
+  987 assd
     /* iden
     ti fica 92231313dsadsa 
       */ 
@@ -27,3 +27,13 @@
     true
     false
     int fn let
+    ()
+    ;
+    []
+    :
+    {}
+    ,
+    bool
+    and
+    or
+    not

@@ -20,6 +20,7 @@ int main(int argc, char* argv[]) {
   SimplLexer lexer(input);
   Token tk = lexer.getNextToken();
   
+
   while(tk != Token::Eof) {
       std::cout << lexer.tokenToString(tk) <<" : "<<lexer.text<< std::endl;
       tk = lexer.getNextToken();

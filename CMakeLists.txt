@@ -9,18 +9,7 @@ add_custom_command (
   COMMAND fa2lexer --src SimplLexer.cpp --hdr tokens.hpp --tpl ${PROJECT_SOURCE_DIR}/Lexer.fa2l
   MAIN_DEPENDENCY ${PROJECT_SOURCE_DIR}/Lexer.fa2l
 
-  DEPENDS ${PROJECT_SOURCE_DIR}/SimplDFA/EOF.jff
-          ${PROJECT_SOURCE_DIR}/SimplDFA/Number.jff
-          ${PROJECT_SOURCE_DIR}/SimplDFA/Ident.jff
-          ${PROJECT_SOURCE_DIR}/SimplDFA/Division_And_Comments.jff
-          ${PROJECT_SOURCE_DIR}/SimplDFA/Addition.jff
-          ${PROJECT_SOURCE_DIR}/SimplDFA/Multiplication.jff
-          ${PROJECT_SOURCE_DIR}/SimplDFA/Subtraction.jff
-          ${PROJECT_SOURCE_DIR}/SimplDFA/Module.jff
-          ${PROJECT_SOURCE_DIR}/SimplDFA/Equal_And_Assignment.jff
-          ${PROJECT_SOURCE_DIR}/SimplDFA/GreaterThanOrEqualTo.jff
-          ${PROJECT_SOURCE_DIR}/SimplDFA/LessThanOrEqualTo.jff
-          ${PROJECT_SOURCE_DIR}/SimplDFA/NotEqual.jff
+  DEPENDS ${PROJECT_SOURCE_DIR}/SimplDFA/*.jff
         
 )
 set(CMAKE_BUILD_TYPE Debug)
