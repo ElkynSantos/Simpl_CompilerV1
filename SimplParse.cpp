@@ -17,6 +17,7 @@ bool SimplParser::parse() {
 void SimplParser::program(){
 
     globalVarDeclare();
+    //globalFnDeclare();
 
 }
 
@@ -43,8 +44,6 @@ void SimplParser :: globalVarDeclare(){
             return;
         }
         
-        std::cout << "Type: " << lexer.tokenToString(currentToken) << std::endl;
-
         if(currentToken == Token::Assignment){
             currentToken = lexer.getNextToken();
             expression();
@@ -56,11 +55,8 @@ void SimplParser :: globalVarDeclare(){
             return;
         }
         else if (currentToken == Token::BracketLeft){
-            std::cout << "Type: " << lexer.tokenToString(currentToken) << std::endl;
-
             currentToken = lexer.getNextToken();
             sizeExpression();
-            std::cout << "Type: " << lexer.tokenToString(currentToken) << std::endl;
 
             if(currentToken != Token::BracketRight) throwError({Token::BracketRight});
             
@@ -97,24 +93,33 @@ void SimplParser :: globalVarDeclare(){
 }
 
 
-void SimplParser::arrayinitializer() {
-    std::cout << "Type: " << lexer.tokenToString(currentToken) << std::endl;
-
-    if (currentToken == Token::Number || currentToken == Token::KwTrue || currentToken == Token::KwFalse) {
+void SimplParser::globalFnDeclare() {
+    if (currentToken == Token::KwFn) {
         currentToken = lexer.getNextToken();
-    } else {
-        expression();
-    }
 
+        if (currentToken != Token::Ident) {
+            throwError({Token::Ident});
+        }
+
+        currentToken = lexer.getNextToken();
+
+        if (currentToken != Token::ParenthesisLeft) {
+            throwError({Token::ParenthesisLeft});
+        }
+
+        currentToken = lexer.getNextToken();
+
+        
+    } else {
+        throwError({Token::KwFn});
+    }
+}
+
+void SimplParser::arrayinitializer() {
+    expression();
     while (currentToken == Token::Comma) {
         currentToken = lexer.getNextToken();
-
-        if (currentToken == Token::Number || currentToken == Token::KwTrue || currentToken == Token::KwFalse) {
-            currentToken = lexer.getNextToken();
-
-        } else {
-            expression();
-        }
+        expression();
     }
 }
 void SimplParser::type(){
@@ -130,99 +135,52 @@ void SimplParser::sizeExpression(){
 }
 
 void SimplParser::expression() {
-    primaryExpression();
+   booleanExpression();
+}
 
-    while (currentToken == Token::Addition || currentToken == Token::Subtraction ||
-           currentToken == Token::Multiplication || currentToken == Token::Division ||
-           currentToken == Token::Module || currentToken == Token::kwAnd ||
-           currentToken == Token::KwOr || currentToken == Token::KwNot|| currentToken == Token::Equal ||
-           currentToken == Token::NotEqual || currentToken == Token::LessThan ||
-           currentToken == Token::LessThanOrEqualTo || currentToken == Token::GreaterThan ||
-           currentToken == Token::GreaterThanOrEqualTo) {
+void SimplParser :: booleanExpression(){
+    booleanTerm();
+    while (currentToken == Token::KwOr) {
         currentToken = lexer.getNextToken();
-        primaryExpression();
+        booleanTerm();
     }
 }
 
-void SimplParser::primaryExpression() {
-    if (currentToken == Token::ParenthesisLeft) {
+void SimplParser::booleanTerm() {
+    booleanFactor();
+    while (currentToken == Token::kwAnd) {
         currentToken = lexer.getNextToken();
-
-        expression();
-
-        if (currentToken != Token::ParenthesisRight) {
-            throw std::runtime_error("Syntax Error: Expected ')'");
-        }
-        currentToken = lexer.getNextToken();
-    } else if (currentToken == Token::Number ||
-               currentToken == Token::KwTrue || currentToken == Token::KwFalse) {
-        currentToken = lexer.getNextToken();
-    } else if (currentToken == Token::Ident) {
-        currentToken = lexer.getNextToken();
-        if (currentToken == Token::BracketLeft) {
-            arrayAccess();
-        } else if (currentToken == Token::ParenthesisLeft) {
-            functionCall(); 
-        }
-    } else {
-        throw std::runtime_error("Syntax Error: Invalid primary expression");
-    }
-}
-
-
-
-void SimplParser::comparisonExpression() {
-    expression();
-    if (currentToken == Token::Equal || currentToken == Token::NotEqual ||
-        currentToken == Token::LessThan || currentToken == Token::LessThanOrEqualTo ||
-        currentToken == Token::GreaterThan || currentToken == Token::GreaterThanOrEqualTo) {
-        currentToken = lexer.getNextToken();
-        expression();
-    } else {
-        throw std::runtime_error("Syntax Error: Expected comparison operator");
-    }
-}
-
-void SimplParser::arrayAccess() {
-
-    if (currentToken == Token::BracketLeft) {
-        currentToken = lexer.getNextToken();
-        expression();
-        if (currentToken != Token::BracketRight) {
-            throw std::runtime_error("Syntax Error: Expected ']'");
-        }
-        currentToken = lexer.getNextToken(); 
-    } else {
-        throw std::runtime_error("Syntax Error: Expected '[' after identifier");
-    }
-}
-
-
-void SimplParser::functionCall() {
-
-    if (currentToken == Token::ParenthesisLeft) {
-        currentToken = lexer.getNextToken();
-        if (currentToken != Token::ParenthesisRight) {
-            argumentList();
-        }
-        if (currentToken != Token::ParenthesisRight) {
-            throw std::runtime_error("Syntax Error: Expected ')'");
-        }
-        currentToken = lexer.getNextToken();
-    } else {
-        throw std::runtime_error("Syntax Error: Expected '(' for function call");
+        booleanFactor();
     }
     
 }
 
-void SimplParser::argumentList() {
-    expression();
-    while (currentToken == Token::Comma) {
+void SimplParser::booleanFactor() {
+    if(currentToken == Token::KwNot){
         currentToken = lexer.getNextToken();
-        expression();
+        booleanFactor();
+    } 
+
+    relationalExpression();
+}
+
+void SimplParser::relationalExpression() {
+   arithmeticExpression();
+   if(currentToken == Token::Equal || currentToken == Token::NotEqual ||
+      currentToken == Token::LessThan || currentToken == Token::LessThanOrEqualTo ||
+      currentToken == Token::GreaterThan || currentToken == Token::GreaterThanOrEqualTo) {
+        currentToken = lexer.getNextToken();
+        arithmeticExpression();
     }
 }
 
+void SimplParser::arithmeticExpression() {
+   term();
+    while (currentToken == Token::Addition || currentToken == Token::Subtraction) {
+        currentToken = lexer.getNextToken();
+        term();
+    }
+}
 
 void SimplParser::throwError(const std::vector<Token>& expectedTokens) {
     std::string errorMessage = "Syntax Error, expected one of -> ";
@@ -234,22 +192,12 @@ void SimplParser::throwError(const std::vector<Token>& expectedTokens) {
     }
     throw std::runtime_error(errorMessage);
 }
-void SimplParser::express(){
-
-    term();
-
-    while(currentToken == Token::Addition){
-        currentToken = lexer.getNextToken();
-        term();
-    }
-    
-}
 
 void SimplParser::term(){
 
     factor();
 
-    while(currentToken == Token::Multiplication){
+    while(currentToken == Token::Multiplication || currentToken == Token::Module || currentToken == Token::Division){
         currentToken = lexer.getNextToken();
         factor();
     }
@@ -258,20 +206,54 @@ void SimplParser::term(){
 
 void SimplParser::factor(){
 
-    if(currentToken == Token::ParenthesisLeft){
-
+    if(currentToken == Token::Addition || currentToken == Token::Subtraction){
         currentToken = lexer.getNextToken();
-        express();
-        if(currentToken != Token::ParenthesisRight){
-            throw std::runtime_error(std::string("Syntax Error expected -> ')'"));
-        }
-
-    }else if(currentToken != Token::Number){
-            throw std::runtime_error(std::string("Syntax Error expected -> 'Number'"));
+        primary();
+          
     }
 
-    currentToken = lexer.getNextToken();
-    
+    primary();
+
+}
+
+void SimplParser::primary(){
+    if(currentToken == Token::Number || currentToken == Token::KwTrue || currentToken == Token::KwFalse){
+        currentToken = lexer.getNextToken();
+    }
+    else if(currentToken == Token::Ident){
+        currentToken = lexer.getNextToken();
+
+        if(currentToken == Token::BracketLeft){
+            currentToken = lexer.getNextToken();
+            expression();
+            if(currentToken != Token::BracketRight) {
+                throwError({Token::BracketRight});
+            }
+            currentToken = lexer.getNextToken();
+
+        }
+
+        if(currentToken == Token::ParenthesisLeft){
+            currentToken = lexer.getNextToken();
+            expression();
+
+            while(currentToken == Token::Comma) {
+                currentToken = lexer.getNextToken();
+                expression();
+            }
+            if(currentToken != Token::ParenthesisRight) {
+                throwError({Token::ParenthesisRight});
+            }  
+            currentToken = lexer.getNextToken();
+        }
+    }else if(currentToken == Token::ParenthesisLeft){
+        currentToken = lexer.getNextToken();
+        expression();
+        if(currentToken != Token::ParenthesisRight) {
+            throwError({Token::ParenthesisRight});
+        }
+        currentToken = lexer.getNextToken();
+    }
 }
 
 

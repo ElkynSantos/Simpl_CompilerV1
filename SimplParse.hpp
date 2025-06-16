@@ -14,23 +14,24 @@ class SimplParser {
     private:
         SimplLexer& lexer;
         Token currentToken;
-        void express();
         void program();
         void globalVarDeclare();
+        void globalFnDeclare();
         void type();
         void sizeExpression();
         void arrayinitializer();
         void expression();
-        void primaryExpression();
         void booleanExpression();
-        void comparisonExpression();
-        void arrayAccess();
-        void argumentList();
-        void functionCall();
+        void booleanTerm();
+        void booleanFactor();
+        void relationalExpression();
         void arithmeticExpression();
-        void globalFunctionDeclare();
         void term();
         void factor();
+        void primary();
+
+        void globalFunctionDeclare();
+
 
         void throwError(const std::vector<Token>& expectedTokens);
 

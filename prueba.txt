@@ -1,7 +1,7 @@
 let globalVar: int = x + 4 + 3;
 let globalVar: bool = true;
 let globalVar: bool[4] = [true,true,true,1, (X),true,(x and 2)];
-let globalVar: int = 100;
+let globalVar: bool = true;
 let globalVar: int = 100;
 let globalVar: int = 100;
 let globalVar: int = 100;
