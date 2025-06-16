@@ -17,7 +17,9 @@ set(CMAKE_BUILD_TYPE Debug)
 set(PROJECT_SOURCE_FILES main.cpp)
 
 set(PROJECT_GENERATED_FILES SimplLexer.cpp
-                            tokens.hpp)
+                            tokens.hpp
+                            SimplParse.cpp
+                            )
 
 add_executable(SimplCompiler ${PROJECT_SOURCE_FILES}
                       ${PROJECT_GENERATED_FILES})

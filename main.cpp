@@ -4,6 +4,7 @@
 #include <sstream>
 #include "SimplLexer.hpp"
 #include "tokens.hpp"
+#include "SimplParse.hpp"
 
 int main(int argc, char* argv[]) {
 
@@ -18,12 +19,10 @@ int main(int argc, char* argv[]) {
   std::string input = buffer.str();
   
   SimplLexer lexer(input);
-  Token tk = lexer.getNextToken();
-  
-
-  while(tk != Token::Eof) {
-      std::cout << lexer.tokenToString(tk) <<" : "<<lexer.text<< std::endl;
-      tk = lexer.getNextToken();
+  SimplParser parser(lexer);
+  parser.parse();
+  if(parser.parse()){
+    std::cout<<"Syntax correct" << std::endl;
   }
   return 0;
 }

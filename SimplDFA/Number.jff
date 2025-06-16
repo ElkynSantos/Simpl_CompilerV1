@@ -20,11 +20,6 @@
 		<!--The list of transitions.-->&#13;
 		<transition>&#13;
 			<from>1</from>&#13;
-			<to>2</to>&#13;
-			<read/>&#13;
-		</transition>&#13;
-		<transition>&#13;
-			<from>1</from>&#13;
 			<to>1</to>&#13;
 			<read>[0-9]</read>&#13;
 		</transition>&#13;
@@ -32,6 +27,11 @@
 			<from>0</from>&#13;
 			<to>1</to>&#13;
 			<read>[0-9]</read>&#13;
+		</transition>&#13;
+		<transition>&#13;
+			<from>1</from>&#13;
+			<to>2</to>&#13;
+			<read/>&#13;
 		</transition>&#13;
 	</automaton>&#13;
 </structure>

@@ -43,7 +43,7 @@ void SimplLexer::reportError(int ch) {
     %file "SimplDFA/LessThanOrEqualTo.jff" name "LessThanOrEqualTo";
     %file "SimplDFA/NotEqual.jff" name "NotEqual";
     %file "SimplDFA/Delimiters.jff" name "Delimiters";
-    %file "SimplDFA/Division_And_Comments3.jff" name "Division_And_Comments3";
+    %file "SimplDFA/Division_And_Comments.jff" name "Division_And_Comments";
 
     %token.descriptions {
         KwIf = "keyword if",
@@ -57,7 +57,12 @@ void SimplLexer::reportError(int ch) {
         KwFn = "Keyword Fn",
         kwAnd = "Keyword And",
         KwOr = "Keyword Or",
-        KwNegation = "Keyword Negation"
+        KwNot = "Keyword Negation",
+        KwRef = "Keyword Ref",
+        KwReturn = "Keyword return",
+        KwFor = "Keyword for",
+        kwNot = "Keyword not",
+        KwVoid = "Keyword void"
     }
 
     %generate.state_enum(State);
@@ -90,7 +95,12 @@ void SimplLexer::initKeywords() {
     keywords["fn"] = Token::KwFn;
     keywords["and"] = Token::kwAnd;
     keywords["or"] = Token::KwOr;
-    keywords["not"] = Token::KwNegation;
+    keywords["not"] = Token::KwNot;
+    keywords["ref"] = Token::KwRef;
+    keywords["for"] = Token::KwFor;
+    keywords["return"] = Token::KwReturn;
+    keywords["void"] = Token::KwVoid;
+
 }
 
 std::optional<Token> SimplLexer :: keywordToken(const std::string& text) {

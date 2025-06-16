@@ -1,39 +1,9 @@
-  987 assd
-    /* iden
-    ti fica 92231313dsadsa 
-      */ 
-    ador 123123
-    // this is a comment
-    /
-    /9
-    /a
-    /* THIS IS A LINES  
-    13$#$#$#@$%$% COMMENT */
-    asda dada
-    ++*-
-    -
-    *
-    %
-    ==
-    !=
-    =
-    >=>
-    <=
-    <
-    x = x
-    if
-    else
-    while
-    true
-    false
-    int fn let
-    ()
-    ;
-    []
-    :
-    {}
-    ,
-    bool
-    and
-    or
-    not
+let globalVar: int = x + 4 + 3;
+let globalVar: bool = true;
+let globalVar: bool[4] = [true,true,true,1, (X),true,(x and 2)];
+let globalVar: int = 100;
+let globalVar: int = 100;
+let globalVar: int = 100;
+let globalVar: int = 100;
+let globalVar: int = 100;
+let globalVar: int = 100;
