@@ -5,6 +5,7 @@
 #include "tokens.hpp"
 
 bool SimplParser::parse() {
+
     currentToken = lexer.getNextToken();
 
     while (currentToken != Token::Eof) {
@@ -97,6 +98,7 @@ void SimplParser :: globalVarDeclare(){
 
 
 void SimplParser::globalFnDeclare() {
+
     if (currentToken == Token::KwFn) {
         currentToken = lexer.getNextToken();
 
@@ -144,6 +146,7 @@ void SimplParser::globalFnDeclare() {
 }
 
 void SimplParser::paramList() {
+
     if (currentToken == Token::Ident) {
         param();   
         while (currentToken == Token::Comma) {
@@ -151,6 +154,7 @@ void SimplParser::paramList() {
             param();
         }
     }
+
 }
 
 void SimplParser :: param(){
@@ -381,6 +385,44 @@ void SimplParser::loop() {
     } else if(currentToken == Token::KwFor){
         currentToken = lexer.getNextToken();
 
+        if(currentToken != Token::Ident) {
+            throwError({Token::Ident});
+        }
+        currentToken = lexer.getNextToken();
+
+        if(currentToken != Token::Assignment) {
+            throwError({Token::Assignment});
+        }
+        currentToken = lexer.getNextToken();
+
+        expression();
+
+        if(currentToken != Token::KwTo) {
+            throwError({Token::KwTo});
+        }
+
+        currentToken = lexer.getNextToken();
+
+        expression();
+
+        if(currentToken == Token::KwStep) {
+            currentToken = lexer.getNextToken();
+            expression();
+        }
+
+        if(currentToken != Token::KeyLeft) {
+            throwError({Token::KeyLeft});
+        }
+        
+        currentToken = lexer.getNextToken();
+        statements();
+
+        if(currentToken != Token::KeyRight) {
+            throwError({Token::KeyRight});
+        }
+
+        currentToken = lexer.getNextToken(); 
+
     }else {
         throwError({Token::KwWhile, Token::KwFor});
     }
@@ -446,14 +488,17 @@ void SimplParser::relationalExpression() {
 }
 
 void SimplParser::arithmeticExpression() {
+
    term();
     while (currentToken == Token::Addition || currentToken == Token::Subtraction) {
         currentToken = lexer.getNextToken();
         term();
     }
+
 }
 
 void SimplParser::throwError(const std::vector<Token>& expectedTokens) {
+    
     std::string errorMessage = "Syntax Error, expected one of -> ";
     for (size_t i = 0; i < expectedTokens.size(); ++i) {
         errorMessage += "'" + lexer.tokenToString(expectedTokens[i]) + "'";
@@ -461,7 +506,9 @@ void SimplParser::throwError(const std::vector<Token>& expectedTokens) {
             errorMessage += ", ";
         }
     }
+
     throw std::runtime_error(errorMessage);
+
 }
 
 void SimplParser::term(){
@@ -488,6 +535,7 @@ void SimplParser::factor(){
 }
 
 void SimplParser::primary(){
+
     if(currentToken == Token::Number || currentToken == Token::KwTrue || currentToken == Token::KwFalse){
         currentToken = lexer.getNextToken();
     }
@@ -525,6 +573,7 @@ void SimplParser::primary(){
         }
         currentToken = lexer.getNextToken();
     }
+
 }
 
 

@@ -102,7 +102,8 @@ void SimplLexer::initKeywords() {
     keywords["for"] = Token::KwFor;
     keywords["return"] = Token::KwReturn;
     keywords["void"] = Token::KwVoid;
-
+    keywords["to"] = Token::KwTo;
+    keywords["step"] = Token::KwStep;
 }
 
 std::optional<Token> SimplLexer :: keywordToken(const std::string& text) {
