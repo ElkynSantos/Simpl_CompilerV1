@@ -62,7 +62,9 @@ void SimplLexer::reportError(int ch) {
         KwReturn = "Keyword return",
         KwFor = "Keyword for",
         kwNot = "Keyword not",
-        KwVoid = "Keyword void"
+        KwVoid = "Keyword void",
+        KwTo = "Keyword to",
+        KwStep = "Keyword Step"
     }
 
     %generate.state_enum(State);
