@@ -16,7 +16,6 @@ class SimplParser {
         Token currentToken;
         void program();
         void globalVarDeclare();
-        void globalFnDeclare();
         void type();
         void sizeExpression();
         void arrayinitializer();
@@ -30,7 +29,21 @@ class SimplParser {
         void factor();
         void primary();
 
-        void globalFunctionDeclare();
+        void globalFnDeclare();
+        void paramList();
+        void param();
+        void functionTypes();
+        void statements();
+        void statement();
+        void conditionalStatement();
+        void argumentList();
+        void returnStatement();
+        void loop();
+
+        void assignmentValues();
+
+
+
 
 
         void throwError(const std::vector<Token>& expectedTokens);

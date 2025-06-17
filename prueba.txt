@@ -1,5 +1,5 @@
 let globalVar: int = x + 4 + 3;
-let globalVar: bool = true;
+let globalVar: bool = (ident(1) + ident(2)) + 3;
 let globalVar: bool[4] = [true,true,true,1, (X),true,(x and 2)];
 let globalVar: bool = true;
 let globalVar: int = 100;
@@ -7,3 +7,53 @@ let globalVar: int = 100;
 let globalVar: int = 100;
 let globalVar: int = 100;
 let globalVar: int = 100;
+
+fn func(prueba : ref int, prueba2: int[5]) -> int {
+    let globalVar: int = 100;
+    globalvar[x] = 100;
+    globalvar = (func(1,true,3) + 3);
+    func(31,31, x[1]);
+    if(x==x){
+
+    }else if(x==3){
+
+    }else{
+
+    }
+    return globalVar;
+}
+
+fn main() -> int {
+    let globalVar: int = 100;
+
+    if(x==x){
+        if(x==x){
+
+        }else if(x==3)
+        {
+
+        }else if(x==4){
+
+        }
+        else{
+            
+        }
+    }else if(x==3){
+
+    }else{
+
+    }
+    while(x==x){
+        while(x==x){
+            if(x==x){
+                
+
+            }else if(x==3){
+
+            }else{
+
+            }
+        }
+    }
+    return 0;
+}
