@@ -39,13 +39,7 @@ class SimplParser {
         void argumentList();
         void returnStatement();
         void loop();
-
         void assignmentValues();
-
-
-
-
-
         void throwError(const std::vector<Token>& expectedTokens);
 
 };
