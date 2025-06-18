@@ -40,6 +40,7 @@ class SimplParser {
         void returnStatement();
         void loop();
         void assignmentValues();
+        void print();
         void throwError(const std::vector<Token>& expectedTokens);
 
 };

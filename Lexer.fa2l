@@ -5,6 +5,7 @@
 #include <optional>
 #include "SimplLexer.hpp"
 #include <unordered_map>
+#include <cctype>
 
 int SimplLexer::getNextChar() {
     if (pos < input.length()) {
@@ -43,6 +44,7 @@ void SimplLexer::reportError(int ch) {
     %file "SimplDFA/LessThanOrEqualTo.jff" name "LessThanOrEqualTo";
     %file "SimplDFA/NotEqual.jff" name "NotEqual";
     %file "SimplDFA/Delimiters.jff" name "Delimiters";
+    %file "SimplDFA/StringLiteral.jff" name "StringLiteral";
     %file "SimplDFA/Division_And_Comments.jff" name "Division_And_Comments";
 
     %token.descriptions {
@@ -64,7 +66,10 @@ void SimplLexer::reportError(int ch) {
         kwNot = "Keyword not",
         KwVoid = "Keyword void",
         KwTo = "Keyword to",
-        KwStep = "Keyword Step"
+        KwStep = "Keyword Step",
+        KwPrint = "Keyword printMessage",
+        KwReadInt = "Keyword Read Int",
+        KwReadBool = "Keyword Read Bool"
     }
 
     %generate.state_enum(State);
@@ -104,6 +109,10 @@ void SimplLexer::initKeywords() {
     keywords["void"] = Token::KwVoid;
     keywords["to"] = Token::KwTo;
     keywords["step"] = Token::KwStep;
+    keywords["print"] = Token::KwPrint;
+    keywords["readInt"] = Token::KwReadInt;
+    keywords["readBool"] = Token::KwReadBool;
+
 }
 
 std::optional<Token> SimplLexer :: keywordToken(const std::string& text) {

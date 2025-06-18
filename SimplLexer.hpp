@@ -4,6 +4,7 @@
 #include <optional>
 #include <unordered_map>
 #include "tokens.hpp"
+#include <cctype>
 
 class SimplLexer {
     public: 

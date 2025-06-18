@@ -25,7 +25,7 @@ fn func(prueba : ref int, prueba2: int[5]) -> int {
 
 fn main() -> int {
     let globalVar: int = 100;
-
+    print("Hola mundo");
     if(x==x){
         if(x==x){
 
