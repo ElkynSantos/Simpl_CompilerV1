@@ -4,6 +4,7 @@
 #include "tokens.hpp"
 #include <vector>
 #include "SimplLexer.hpp"
+#include "SimplAst.hpp"
 
 
 class SimplParser {

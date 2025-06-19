@@ -1,0 +1,67 @@
+Program         = { global_var_decl | globalFnDeclare }* ;
+
+Statement       = GlobalVarDeclare
+                | GlobalFnDeclare
+                | ConditionalStatement
+                | Loop
+                | Print
+                | ReturnStatement
+                | AssignmentValues ;
+
+GlobalVarDeclare = "let" Identifier ":" Type [ "=" Expression | "[" SizeExpression "]" [ "=" "[" ArrayInitializer "]" ] ] ";" ;
+
+GlobalFnDeclare = "fn" Identifier "(" ParamList ")" "=>" FunctionTypes "{" Statements "}" ;
+
+ParamList       = [ Param { "," Param } ] ;
+Param           = Identifier ":" [ "ref" ] Type [ "[" SizeExpression "]" ] ;
+
+FunctionTypes   = "int" | "bool" | "void" ;
+
+Statements      = { Statement } ;
+
+ConditionalStatement = "if" "(" Expression ")" "{" Statements "}" [ "else" ( ConditionalStatement | "{" Statements "}" ) ] ;
+
+Loop            = WhileLoop | ForLoop ;
+WhileLoop       = "while" "(" Expression ")" "{" Statements "}" ;
+ForLoop         = "for" Identifier "=" Expression "to" Expression [ "step" Expression ] "{" Statements "}" ;
+
+Print           = "print" "(" ( StringLiteral | Identifier ) ")" ";" ;
+
+ReturnStatement = "return" [ Expression ] ";" ;
+
+AssignmentValues = Identifier [ "(" ArgumentList ")" | "[" SizeExpression "]" ] "=" Expression ";" ;
+
+ArgumentList    = Expression { "," Expression } ;
+
+ArrayInitializer = Expression { "," Expression } ;
+
+Type            = "int" | "bool" ;
+
+SizeExpression  = Expression ;
+
+Expression      = BooleanExpression ;
+
+BooleanExpression = BooleanTerm { "or" BooleanTerm } ;
+BooleanTerm     = BooleanFactor { "and" BooleanFactor } ;
+BooleanFactor   = [ "not" ] RelationalExpression ;
+
+RelationalExpression = ArithmeticExpression [ RelationalOperator ArithmeticExpression ] ;
+RelationalOperator = "==" | "!=" | "<" | "<=" | ">" | ">=" ;
+
+ArithmeticExpression = Term { ("+" | "-") Term } ;
+Term            = Factor { ("*" | "/" | "%") Factor } ;
+Factor          = [ ("+" | "-") ] Primary ;
+
+Primary         = Number
+                | "true"
+                | "false"
+                | Identifier [ "[" Expression "]" | "(" ArgumentList ")" ]
+                | "(" Expression ")"
+                | ReadFunction ;
+
+ReadFunction    = "readInt" "(" ")" | "readBool" "(" ")" ;
+
+Identifier      = /* Identifier token */ ;
+Number          = /* Number token */ ;
+StringLiteral   = /* String literal token */ ;
+EOF             = /* End of file token */ ;
