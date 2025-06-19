@@ -235,8 +235,8 @@ void SimplParser :: print(){
             throwError({Token :: ParenthesisLeft});
         }
         currentToken = lexer.getNextToken();
-        if(currentToken != Token::StringLiteral){
-            throwError({Token :: StringLiteral});
+        if(currentToken != Token::StringLiteral || currentToken != Token::Ident){
+            throwError({Token :: StringLiteral, Token::Ident});
         }
         currentToken = lexer.getNextToken();
 
