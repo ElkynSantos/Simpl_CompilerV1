@@ -10,16 +10,15 @@
 class SimplParser {
     public:
         SimplParser(SimplLexer& lexer): lexer(lexer), currentToken(Token::Eof){}
-        bool parse();
+        programNode* parse();
 
     private:
         SimplLexer& lexer;
         Token currentToken;
-        AstNode* program();
-        AstNode* globalVarDeclare();
-        AstNode* type();
-        AstNode* sizeExpression();
-        AstNode* arrayinitializer();
+        programNode* program();
+        GlobalVarDeclNode* globalVarDeclare();
+        TypeNameNode* type();
+        std::vector<AstNode*> arrayinitializer();
         AstNode* expression();
         AstNode* booleanExpression();
         AstNode* booleanTerm();
@@ -29,20 +28,21 @@ class SimplParser {
         AstNode* term();
         AstNode* factor();
         AstNode* primary();
-        AstNode* argumentList();
 
-        // void globalFnDeclare();
-        // void paramList();
-        // void param();
-        // void functionTypes();
-        // void statements();
-        // void statement();
-        // void conditionalStatement();
-        // void argumentList();
-        // void returnStatement();
-        // void loop();
-        // void assignmentValues();
-        // void print();
+        sizeExpressionNode* sizeExpression();
+        std::vector<AstNode*> argumentList();
+
+        GlobalFnDeclareNode* globalFnDeclare();
+        ParameterList*  paramList();
+        Parameter* param();
+        TypeNameFunctionNode* functionTypes();
+        std::vector<statementsNode*> statements();
+        AstNode* statement();
+        ConditionalStatement* conditionalStatement();
+        ReturnStatement* returnStatement();
+        AstNode* loop();
+        AstNode* assignmentValues(); // here call function
+        PrintStatement* print();
         void throwError(const std::vector<Token>& expectedTokens);
 
 };
