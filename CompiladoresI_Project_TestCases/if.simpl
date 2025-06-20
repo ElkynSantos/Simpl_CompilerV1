@@ -1,0 +1,13 @@
+fn main() -> int
+{
+    let x: int;
+
+    x = readInt();   // enter a number
+
+    if (x % 2 == 0) {
+        print(0);             // even
+    } else {
+        print(1);             // odd
+    }
+    return 0;
+}

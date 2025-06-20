@@ -45,7 +45,7 @@ void SimplLexer::reportError(int ch) {
     %file "SimplDFA/NotEqual.jff" name "NotEqual";
     %file "SimplDFA/Delimiters.jff" name "Delimiters";
     %file "SimplDFA/StringLiteral.jff" name "StringLiteral";
-    %file "SimplDFA/Division_And_Comments.jff" name "Division_And_Comments";
+    %file "SimplDFA/Division_And_Comments3.jff" name "Division_And_Comments";
 
     %token.descriptions {
         KwIf = "keyword if",

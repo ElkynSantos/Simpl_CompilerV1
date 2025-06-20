@@ -1,0 +1,10 @@
+fn main() -> int
+{
+    let a: bool = true and false;                 // false
+    let b: bool = true or false;                  // true
+    let c: bool = not false;                      // true
+    let d: bool = (5 > 3) and (3 > 4) or true;    // true  (tests precedence)
+
+    print(a); print(b); print(c); print(d);
+    return 0;
+}

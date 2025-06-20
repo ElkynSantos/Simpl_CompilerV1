@@ -1,0 +1,35 @@
+// ------- square & bump use BY-VALUE parameters -------
+
+fn square(n: int) -> int
+{
+    // Changing n here does NOT change the caller's variable.
+    n = n * n;
+    return n;
+}
+
+fn bump(x: int) -> int
+{
+    x = x + 1;          // local copy only
+    return x;
+}
+
+fn main() -> int {
+    let a: int = 3;
+    let b: int = 4;
+    let hypSquared: int;
+    let isNextEven: bool;
+
+    // function calls embedded in a larger arithmetic expression
+    hypSquared = square(a) + square(b);   // 9 + 16 = 25
+
+    // function call inside a boolean expression
+    isNextEven = (bump(a) % 2 == 0) and (a == 3);
+    // bump(a) returns 4, so left side is true;  a is still 3 (by-value!), so right side is true ⇒ overall true
+
+    print(a);           // 3   (unchanged)
+    print(hypSquared);  // 25
+    print(isNextEven);  // true
+
+    return 0;
+}
+// Expected output sequence: 3 25 true

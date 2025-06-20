@@ -5,6 +5,7 @@
 		<state id="0" name="q0">&#13;
 			<x>171.0</x>&#13;
 			<y>129.0</y>&#13;
+			<label>text.clear();</label>&#13;
 			<initial/>&#13;
 		</state>&#13;
 		<state id="1" name="q1">&#13;

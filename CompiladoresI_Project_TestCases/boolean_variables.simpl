@@ -1,0 +1,8 @@
+fn main() -> int
+{
+    let flag: bool; // default false
+    print(flag);    // false
+    flag = true;
+    print(flag);    // true
+    return 0;
+}

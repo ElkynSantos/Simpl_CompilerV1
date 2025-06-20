@@ -1,0 +1,48 @@
+fn swap(ref x: int, ref y: int) -> void
+{
+    let tmp: int = x;
+    x = y;
+    y = tmp;
+}
+
+fn inc(ref v: int) -> void
+{
+    v = v + 1;
+}
+
+fn negate(ref flag: bool) -> void
+{
+    flag = not flag;
+}
+
+fn fill(ref arr: int[3], value: int) -> void
+{
+    for i = 0 to 2 {
+        arr[i] = value;
+    }
+}
+
+fn main() -> int
+{
+    let p: int = 5;
+    let q: int = 10;
+    let ok: bool = false;
+    let data: int[3];
+
+    swap(ref p, ref q);
+    inc(ref p);
+    print(p);
+    print(q);
+
+    negate(ref ok);
+    print(ok);
+
+    fill(ref data, 7);
+
+    print(data[0]);
+    print(data[1]);
+    print(data[2]);
+
+    return 0;
+}
+// Expected output sequence: 11 5 true 7 7 7

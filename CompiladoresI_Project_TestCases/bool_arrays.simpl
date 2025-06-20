@@ -1,0 +1,12 @@
+fn main() -> int
+{
+    let flags: bool[2] = [true, false];
+
+    print(flags[0]); print(flags[1]); // true false
+
+    flags[1] = not flags[0];
+
+    print(flags[1]);                  // false
+
+    return 0;
+}

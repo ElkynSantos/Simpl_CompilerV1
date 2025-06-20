@@ -11,7 +11,7 @@ int main(int argc, char* argv[]) {
   std::ifstream file(argv[1]);
   if (!file.is_open()) {
       std::cout << "Error al abrir el archivo: " << argv[1] << std::endl;
-      return 1;
+      return 0;
   }
 
   std::stringstream buffer;
@@ -20,7 +20,7 @@ int main(int argc, char* argv[]) {
   
   SimplLexer lexer(input);
   SimplParser parser(lexer);
-  parser.parse();
+
   if(parser.parse()){
     std::cout<<"Syntax correct" << std::endl;
   }

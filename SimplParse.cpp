@@ -14,7 +14,6 @@ bool SimplParser::parse() {
     return true;
 }
 
-
 void SimplParser::program(){
 
     if(currentToken == Token::KwLet) {
@@ -96,7 +95,6 @@ void SimplParser :: globalVarDeclare(){
 
 }
 
-
 void SimplParser::globalFnDeclare() {
 
     if (currentToken == Token::KwFn) {
@@ -133,7 +131,6 @@ void SimplParser::globalFnDeclare() {
         currentToken = lexer.getNextToken();
         
         statements();
-
         if( currentToken != Token::KeyRight) {
             throwError({Token::KeyRight});
         }
@@ -195,6 +192,7 @@ void SimplParser::functionTypes(){
         throwError({Token::KwInt, Token::KwBool, Token::KwVoid});
     }
 }
+
 void SimplParser::statements(){
     
     while(currentToken == Token::KwLet ||  currentToken == Token::Ident || currentToken == Token::KwIf || currentToken == Token::KwWhile || 
@@ -235,10 +233,21 @@ void SimplParser :: print(){
             throwError({Token :: ParenthesisLeft});
         }
         currentToken = lexer.getNextToken();
-        if(currentToken != Token::StringLiteral && currentToken != Token::Ident){
+        if(currentToken == Token::StringLiteral || currentToken == Token::Ident){
+            currentToken = lexer.getNextToken();
+
+            if(currentToken == Token::BracketLeft){
+                currentToken = lexer.getNextToken();
+                sizeExpression();
+                if(currentToken != Token::BracketRight){
+                    throwError({Token :: BracketRight});
+                }
+                currentToken = lexer.getNextToken();
+
+            }
+        }else{
             throwError({Token :: StringLiteral, Token::Ident});
         }
-        currentToken = lexer.getNextToken();
 
         if(currentToken != Token::ParenthesisRight){
             throwError({Token :: ParenthesisRight});
@@ -246,12 +255,10 @@ void SimplParser :: print(){
         }
         currentToken = lexer.getNextToken();
         if(currentToken != Token::Semicolon){
-            throwError({Token :: ParenthesisRight});
+            throwError({Token :: Semicolon});
 
         }
         currentToken = lexer.getNextToken();
-
-
     }else{
         throwError({Token :: KwPrint});
 
@@ -266,8 +273,12 @@ void SimplParser::returnStatement() {
             if (currentToken != Token::Semicolon) {
                 throwError({Token::Semicolon});
             }
+            currentToken = lexer.getNextToken();
+            
+        }else{
+             currentToken = lexer.getNextToken();
         }
-        currentToken = lexer.getNextToken();
+       
     } else {
         throwError({Token::KwReturn});
     }
@@ -341,6 +352,8 @@ void SimplParser::conditionalStatement() {
         currentToken = lexer.getNextToken();
 
         statements();
+
+        std::cout << "Current token after statements: " << lexer.tokenToString(currentToken) << std::endl;
         if(currentToken != Token::KeyRight) {
             throwError({Token::KeyRight});
         }
@@ -528,7 +541,7 @@ void SimplParser::relationalExpression() {
 
 void SimplParser::arithmeticExpression() {
 
-   term();
+    term();
     while (currentToken == Token::Addition || currentToken == Token::Subtraction) {
         currentToken = lexer.getNextToken();
         term();
@@ -593,12 +606,8 @@ void SimplParser::primary(){
 
         if(currentToken == Token::ParenthesisLeft){
             currentToken = lexer.getNextToken();
-            expression();
-
-            while(currentToken == Token::Comma) {
-                currentToken = lexer.getNextToken();
-                expression();
-            }
+            
+            argumentList();
             if(currentToken != Token::ParenthesisRight) {
                 throwError({Token::ParenthesisRight});
             }  

@@ -1,0 +1,21 @@
+fn main() -> int
+{
+    let sum: int = 0;
+
+    for i = 1 to 5 {          // 1 + 2 + 3 + 4 + 5
+        sum = sum + i;
+    }
+
+    print(sum);               // 15
+    return 0;
+}
+fn main() -> int
+{
+    let a: bool = true and false;                 // false
+    let b: bool = true or false;                  // true
+    let c: bool = not false;                      // true
+    let d: bool = (5 > 3) and (3 > 4) or true;    // true  (tests precedence)
+
+    print(a); print(b); print(c); print(d);
+    return 0;
+}

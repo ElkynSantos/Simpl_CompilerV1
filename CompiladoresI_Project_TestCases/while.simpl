@@ -1,0 +1,13 @@
+fn main() -> int
+{
+    let n: int = 5;
+    let fact: int = 1;
+
+    while (n > 1) {
+        fact = fact * n;
+        n = n - 1;
+    }
+
+    print(fact); // 120
+    return 0;
+}

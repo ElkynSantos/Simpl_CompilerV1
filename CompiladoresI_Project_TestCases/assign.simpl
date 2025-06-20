@@ -1,0 +1,14 @@
+fn main() -> int
+{
+    let a: int = 3;
+    let b: int = 4;
+    let arr: int[2];
+
+    a = a * b;        // 12
+    arr[0] = a;       // arr[0] = 12
+    arr[1] = arr[0] / 2;
+
+    print(arr[0]); print(arr[1]); // 12 6
+
+    return 0;
+}

@@ -31,6 +31,8 @@ ReturnStatement = "return" [ Expression ] ";" ;
 
 AssignmentValues = Identifier [ "(" ArgumentList ")" | "[" SizeExpression "]" ] "=" Expression ";" ;
 
+AssignmentValues =: Expression = Expression ";" ;
+
 ArgumentList    = Expression { "," Expression } ;
 
 ArrayInitializer = Expression { "," Expression } ;
@@ -52,12 +54,12 @@ ArithmeticExpression = Term { ("+" | "-") Term } ;
 Term            = Factor { ("*" | "/" | "%") Factor } ;
 Factor          = [ ("+" | "-") ] Primary ;
 
-Primary         = Number
-                | "true"
-                | "false"
-                | Identifier [ "[" Expression "]" | "(" ArgumentList ")" ]
-                | "(" Expression ")"
-                | ReadFunction ;
+Primary = Number
+    | "true"
+    | "false"
+    | Identifier [ "[" Expression "]" | "(" ArgumentList ")" ]
+    | "(" Expression ")"
+    | ReadFunction ;
 
 ReadFunction    = "readInt" "(" ")" | "readBool" "(" ")" ;
 
