@@ -14,18 +14,19 @@ bool SimplParser::parse() {
     return true;
 }
 
-void SimplParser::program(){
+AstNode* SimplParser::program(){
 
     if(currentToken == Token::KwLet) {
         globalVarDeclare();
 
-    }else if(currentToken == Token::KwFn) {
-        globalFnDeclare();
     }
+    //else if(currentToken == Token::KwFn) {
+    //     globalFnDeclare();
+    // }
 
 }
 
-void SimplParser :: globalVarDeclare(){
+AstNode* SimplParser :: globalVarDeclare(){
     
     if( currentToken == Token::KwLet){
        
@@ -95,399 +96,399 @@ void SimplParser :: globalVarDeclare(){
 
 }
 
-void SimplParser::globalFnDeclare() {
+// AstNode* SimplParser::globalFnDeclare() {
 
-    if (currentToken == Token::KwFn) {
-        currentToken = lexer.getNextToken();
+//     if (currentToken == Token::KwFn) {
+//         currentToken = lexer.getNextToken();
 
-        if (currentToken != Token::Ident) {
-            throwError({Token::Ident});
-        }
+//         if (currentToken != Token::Ident) {
+//             throwError({Token::Ident});
+//         }
 
-        currentToken = lexer.getNextToken();
+//         currentToken = lexer.getNextToken();
 
-        if (currentToken != Token::ParenthesisLeft) {
-            throwError({Token::ParenthesisLeft});
-        }
-        currentToken = lexer.getNextToken();
-        paramList();
-        if(currentToken != Token::ParenthesisRight) {
-            throwError({Token::ParenthesisRight});
-        }
-        currentToken = lexer.getNextToken();
+//         if (currentToken != Token::ParenthesisLeft) {
+//             throwError({Token::ParenthesisLeft});
+//         }
+//         currentToken = lexer.getNextToken();
+//         paramList();
+//         if(currentToken != Token::ParenthesisRight) {
+//             throwError({Token::ParenthesisRight});
+//         }
+//         currentToken = lexer.getNextToken();
 
-        if (currentToken != Token::AssignmentFunction) {
-            throwError({Token::AssignmentFunction});
-        }
+//         if (currentToken != Token::AssignmentFunction) {
+//             throwError({Token::AssignmentFunction});
+//         }
 
-        currentToken = lexer.getNextToken();
+//         currentToken = lexer.getNextToken();
 
-        functionTypes();
+//         functionTypes();
 
-        if(currentToken != Token::KeyLeft) {
-            throwError({Token::KeyLeft});
-        }
+//         if(currentToken != Token::KeyLeft) {
+//             throwError({Token::KeyLeft});
+//         }
 
-        currentToken = lexer.getNextToken();
+//         currentToken = lexer.getNextToken();
         
-        statements();
-        if( currentToken != Token::KeyRight) {
-            throwError({Token::KeyRight});
-        }
+//         statements();
+//         if( currentToken != Token::KeyRight) {
+//             throwError({Token::KeyRight});
+//         }
 
-        currentToken = lexer.getNextToken();
+//         currentToken = lexer.getNextToken();
 
-    } else {
-        throwError({Token::KwFn});
-    }
-}
+//     } else {
+//         throwError({Token::KwFn});
+//     }
+// }
 
-void SimplParser::paramList() {
+// AstNode* SimplParser::paramList() {
 
-    if (currentToken == Token::Ident) {
-        param();   
-        while (currentToken == Token::Comma) {
-            currentToken = lexer.getNextToken();
-            param();
-        }
-    }
+//     if (currentToken == Token::Ident) {
+//         param();   
+//         while (currentToken == Token::Comma) {
+//             currentToken = lexer.getNextToken();
+//             param();
+//         }
+//     }
 
-}
+// }
 
-void SimplParser :: param(){
+// AstNode* SimplParser :: param(){
 
-    if(currentToken == Token::Ident) {
-        currentToken = lexer.getNextToken();
-        if(currentToken != Token::Colon) {
-            throwError({Token::Colon});
-        }
+//     if(currentToken == Token::Ident) {
+//         currentToken = lexer.getNextToken();
+//         if(currentToken != Token::Colon) {
+//             throwError({Token::Colon});
+//         }
 
-        currentToken = lexer.getNextToken();
+//         currentToken = lexer.getNextToken();
 
-        if(currentToken == Token::KwRef) {
-            currentToken = lexer.getNextToken();
-        }
+//         if(currentToken == Token::KwRef) {
+//             currentToken = lexer.getNextToken();
+//         }
        
-        type();
+//         type();
 
-        if(currentToken == Token::BracketLeft) {
-            currentToken = lexer.getNextToken();
-            sizeExpression();
-            if(currentToken != Token::BracketRight) {
-                throwError({Token::BracketRight});
-            }
-            currentToken = lexer.getNextToken();
-        }
+//         if(currentToken == Token::BracketLeft) {
+//             currentToken = lexer.getNextToken();
+//             sizeExpression();
+//             if(currentToken != Token::BracketRight) {
+//                 throwError({Token::BracketRight});
+//             }
+//             currentToken = lexer.getNextToken();
+//         }
            
-    }else {
-        throwError({Token::Ident});
-    }
+//     }else {
+//         throwError({Token::Ident});
+//     }
 
-}
+// }
 
-void SimplParser::functionTypes(){
-    if(currentToken == Token::KwInt || currentToken == Token::KwBool || currentToken == Token::KwVoid){
-        currentToken = lexer.getNextToken();
-    }else{
-        throwError({Token::KwInt, Token::KwBool, Token::KwVoid});
-    }
-}
+// AstNode* SimplParser::functionTypes(){
+//     if(currentToken == Token::KwInt || currentToken == Token::KwBool || currentToken == Token::KwVoid){
+//         currentToken = lexer.getNextToken();
+//     }else{
+//         throwError({Token::KwInt, Token::KwBool, Token::KwVoid});
+//     }
+// }
 
-void SimplParser::statements(){
+// AstNode* SimplParser::statements(){
     
-    while(currentToken == Token::KwLet ||  currentToken == Token::Ident || currentToken == Token::KwIf || currentToken == Token::KwWhile || 
-           currentToken == Token::KwFor || currentToken == Token::KwReturn || currentToken == Token::KwPrint){
-        statement();
-    }
+//     while(currentToken == Token::KwLet ||  currentToken == Token::Ident || currentToken == Token::KwIf || currentToken == Token::KwWhile || 
+//            currentToken == Token::KwFor || currentToken == Token::KwReturn || currentToken == Token::KwPrint){
+//         statement();
+//     }
 
-}
+// }
 
-void SimplParser::statement(){
+// AstNode* SimplParser::statement(){
 
-    if(currentToken == Token::KwLet) {
-        globalVarDeclare();
-    } 
-    else if (currentToken == Token::Ident) {
-        // logic call function here
-        assignmentValues();
-    } 
-    else if (currentToken == Token::KwIf) {
-        conditionalStatement();
-    } 
-    else if (currentToken == Token::KwWhile || currentToken == Token::KwFor) {
-        loop();
-    }
-    else if(currentToken == Token::KwPrint){
-        print();
-    } 
-    else if (currentToken == Token::KwReturn) {
-       returnStatement();
-    }
+//     if(currentToken == Token::KwLet) {
+//         globalVarDeclare();
+//     } 
+//     else if (currentToken == Token::Ident) {
+//         // logic call function here
+//         assignmentValues();
+//     } 
+//     else if (currentToken == Token::KwIf) {
+//         conditionalStatement();
+//     } 
+//     else if (currentToken == Token::KwWhile || currentToken == Token::KwFor) {
+//         loop();
+//     }
+//     else if(currentToken == Token::KwPrint){
+//         print();
+//     } 
+//     else if (currentToken == Token::KwReturn) {
+//        returnStatement();
+//     }
     
-}
+// }
 
-void SimplParser :: print(){
-    if(currentToken == Token::KwPrint){
-        currentToken = lexer.getNextToken();
-        if(currentToken != Token::ParenthesisLeft){
-            throwError({Token :: ParenthesisLeft});
-        }
-        currentToken = lexer.getNextToken();
-        if(currentToken == Token::StringLiteral || currentToken == Token::Ident){
-            currentToken = lexer.getNextToken();
+// AstNode* SimplParser :: print(){
+//     if(currentToken == Token::KwPrint){
+//         currentToken = lexer.getNextToken();
+//         if(currentToken != Token::ParenthesisLeft){
+//             throwError({Token :: ParenthesisLeft});
+//         }
+//         currentToken = lexer.getNextToken();
+//         if(currentToken == Token::StringLiteral || currentToken == Token::Ident){
+//             currentToken = lexer.getNextToken();
 
-            if(currentToken == Token::BracketLeft){
-                currentToken = lexer.getNextToken();
-                sizeExpression();
-                if(currentToken != Token::BracketRight){
-                    throwError({Token :: BracketRight});
-                }
-                currentToken = lexer.getNextToken();
+//             if(currentToken == Token::BracketLeft){
+//                 currentToken = lexer.getNextToken();
+//                 sizeExpression();
+//                 if(currentToken != Token::BracketRight){
+//                     throwError({Token :: BracketRight});
+//                 }
+//                 currentToken = lexer.getNextToken();
 
-            }
-        }else{
-            throwError({Token :: StringLiteral, Token::Ident});
-        }
+//             }
+//         }else{
+//             throwError({Token :: StringLiteral, Token::Ident});
+//         }
 
-        if(currentToken != Token::ParenthesisRight){
-            throwError({Token :: ParenthesisRight});
+//         if(currentToken != Token::ParenthesisRight){
+//             throwError({Token :: ParenthesisRight});
         
-        }
-        currentToken = lexer.getNextToken();
-        if(currentToken != Token::Semicolon){
-            throwError({Token :: Semicolon});
+//         }
+//         currentToken = lexer.getNextToken();
+//         if(currentToken != Token::Semicolon){
+//             throwError({Token :: Semicolon});
 
-        }
-        currentToken = lexer.getNextToken();
-    }else{
-        throwError({Token :: KwPrint});
+//         }
+//         currentToken = lexer.getNextToken();
+//     }else{
+//         throwError({Token :: KwPrint});
 
-    }
-}
+//     }
+// }
 
-void SimplParser::returnStatement() {
-    if (currentToken == Token::KwReturn) {
-        currentToken = lexer.getNextToken();
-        if (currentToken != Token::Semicolon) {
-            expression();
-            if (currentToken != Token::Semicolon) {
-                throwError({Token::Semicolon});
-            }
-            currentToken = lexer.getNextToken();
+// AstNode* SimplParser::returnStatement() {
+//     if (currentToken == Token::KwReturn) {
+//         currentToken = lexer.getNextToken();
+//         if (currentToken != Token::Semicolon) {
+//             expression();
+//             if (currentToken != Token::Semicolon) {
+//                 throwError({Token::Semicolon});
+//             }
+//             currentToken = lexer.getNextToken();
             
-        }else{
-             currentToken = lexer.getNextToken();
-        }
+//         }else{
+//              currentToken = lexer.getNextToken();
+//         }
        
-    } else {
-        throwError({Token::KwReturn});
-    }
-}
+//     } else {
+//         throwError({Token::KwReturn});
+//     }
+// }
 
-void SimplParser::assignmentValues(){
-    if(currentToken == Token::Ident) {
-        currentToken = lexer.getNextToken();
-        //functionCall
-        if(currentToken == Token::ParenthesisLeft) {
-            currentToken = lexer.getNextToken();
+// AstNode* SimplParser::assignmentValues(){
+//     if(currentToken == Token::Ident) {
+//         currentToken = lexer.getNextToken();
+//         //functionCall
+//         if(currentToken == Token::ParenthesisLeft) {
+//             currentToken = lexer.getNextToken();
 
-            argumentList();
-            if(currentToken != Token::ParenthesisRight) {
-                throwError({Token::ParenthesisRight});
-            }
-            currentToken = lexer.getNextToken();
+//             argumentList();
+//             if(currentToken != Token::ParenthesisRight) {
+//                 throwError({Token::ParenthesisRight});
+//             }
+//             currentToken = lexer.getNextToken();
 
-            if(currentToken != Token::Semicolon) {
-                throwError({Token::Semicolon});
-            }
-            currentToken = lexer.getNextToken();
+//             if(currentToken != Token::Semicolon) {
+//                 throwError({Token::Semicolon});
+//             }
+//             currentToken = lexer.getNextToken();
 
-            return;
-        }
-        else if(currentToken == Token::BracketLeft) {
-            currentToken = lexer.getNextToken();
-            sizeExpression();
-            if(currentToken != Token::BracketRight) {
-                throwError({Token::BracketRight});
-            }
-            currentToken = lexer.getNextToken();
-        }
+//             return;
+//         }
+//         else if(currentToken == Token::BracketLeft) {
+//             currentToken = lexer.getNextToken();
+//             sizeExpression();
+//             if(currentToken != Token::BracketRight) {
+//                 throwError({Token::BracketRight});
+//             }
+//             currentToken = lexer.getNextToken();
+//         }
 
-        if(currentToken == Token::Assignment) {
-            currentToken = lexer.getNextToken();
-            expression();
-            if(currentToken != Token::Semicolon) {
-                throwError({Token::Semicolon});
-            }
-            currentToken = lexer.getNextToken();
-        }
-    }else{
-        throwError({Token::Ident});
-    }
-}
+//         if(currentToken == Token::Assignment) {
+//             currentToken = lexer.getNextToken();
+//             expression();
+//             if(currentToken != Token::Semicolon) {
+//                 throwError({Token::Semicolon});
+//             }
+//             currentToken = lexer.getNextToken();
+//         }
+//     }else{
+//         throwError({Token::Ident});
+//     }
+// }
 
-void SimplParser::argumentList() {
+AstNode* SimplParser::argumentList() {
     expression();
     while (currentToken == Token::Comma) {
         currentToken = lexer.getNextToken();
         expression();
     }
 }
-void SimplParser::conditionalStatement() {
-    if(currentToken == Token::KwIf) {
-        currentToken = lexer.getNextToken();
-        if(currentToken != Token::ParenthesisLeft) {
-            throwError({Token::ParenthesisLeft});
-        }
-        currentToken = lexer.getNextToken();
-        expression();
-        if(currentToken != Token::ParenthesisRight) {
-            throwError({Token::ParenthesisRight});
-        }
-        currentToken = lexer.getNextToken();
+// AstNode* SimplParser::conditionalStatement() {
+//     if(currentToken == Token::KwIf) {
+//         currentToken = lexer.getNextToken();
+//         if(currentToken != Token::ParenthesisLeft) {
+//             throwError({Token::ParenthesisLeft});
+//         }
+//         currentToken = lexer.getNextToken();
+//         expression();
+//         if(currentToken != Token::ParenthesisRight) {
+//             throwError({Token::ParenthesisRight});
+//         }
+//         currentToken = lexer.getNextToken();
         
-        if(currentToken != Token::KeyLeft) {
-            throwError({Token::KeyLeft});
-        }
-        currentToken = lexer.getNextToken();
+//         if(currentToken != Token::KeyLeft) {
+//             throwError({Token::KeyLeft});
+//         }
+//         currentToken = lexer.getNextToken();
 
-        statements();
+//         statements();
 
-        std::cout << "Current token after statements: " << lexer.tokenToString(currentToken) << std::endl;
-        if(currentToken != Token::KeyRight) {
-            throwError({Token::KeyRight});
-        }
+//         std::cout << "Current token after statements: " << lexer.tokenToString(currentToken) << std::endl;
+//         if(currentToken != Token::KeyRight) {
+//             throwError({Token::KeyRight});
+//         }
 
-        currentToken = lexer.getNextToken();
+//         currentToken = lexer.getNextToken();
         
-       while (currentToken == Token::KwElse) {
-            currentToken = lexer.getNextToken();
+//        while (currentToken == Token::KwElse) {
+//             currentToken = lexer.getNextToken();
 
-            if (currentToken == Token::KwIf) {
-                currentToken = lexer.getNextToken();
+//             if (currentToken == Token::KwIf) {
+//                 currentToken = lexer.getNextToken();
 
-                if (currentToken != Token::ParenthesisLeft) {
-                    throwError({Token::ParenthesisLeft});
-                }
-                currentToken = lexer.getNextToken();
+//                 if (currentToken != Token::ParenthesisLeft) {
+//                     throwError({Token::ParenthesisLeft});
+//                 }
+//                 currentToken = lexer.getNextToken();
 
-                expression(); 
-                if (currentToken != Token::ParenthesisRight) {
-                    throwError({Token::ParenthesisRight});
-                }
-                currentToken = lexer.getNextToken();
+//                 expression(); 
+//                 if (currentToken != Token::ParenthesisRight) {
+//                     throwError({Token::ParenthesisRight});
+//                 }
+//                 currentToken = lexer.getNextToken();
 
-                if (currentToken != Token::KeyLeft) {
-                    throwError({Token::KeyLeft});
-                }
-                currentToken = lexer.getNextToken();
+//                 if (currentToken != Token::KeyLeft) {
+//                     throwError({Token::KeyLeft});
+//                 }
+//                 currentToken = lexer.getNextToken();
 
-                statements();
+//                 statements();
 
-                if (currentToken != Token::KeyRight) {
-                    throwError({Token::KeyRight});
-                }
-                currentToken = lexer.getNextToken();
-            } else {
-                if (currentToken != Token::KeyLeft) {
-                    throwError({Token::KeyLeft});
-                }
-                currentToken = lexer.getNextToken();
+//                 if (currentToken != Token::KeyRight) {
+//                     throwError({Token::KeyRight});
+//                 }
+//                 currentToken = lexer.getNextToken();
+//             } else {
+//                 if (currentToken != Token::KeyLeft) {
+//                     throwError({Token::KeyLeft});
+//                 }
+//                 currentToken = lexer.getNextToken();
 
-                statements(); 
+//                 statements(); 
 
-                if (currentToken != Token::KeyRight) {
-                    throwError({Token::KeyRight});
-                }
-                currentToken = lexer.getNextToken();
+//                 if (currentToken != Token::KeyRight) {
+//                     throwError({Token::KeyRight});
+//                 }
+//                 currentToken = lexer.getNextToken();
 
-                break;
-            }
-        }     
+//                 break;
+//             }
+//         }     
        
-    }else {
-        throwError({Token::KwIf});
-    }
-}
+//     }else {
+//         throwError({Token::KwIf});
+//     }
+// }
 
 
-void SimplParser::loop() {
-    if (currentToken == Token::KwWhile) {
-        currentToken = lexer.getNextToken();
-        if (currentToken != Token::ParenthesisLeft) {
-            throwError({Token::ParenthesisLeft});
-        }
-        currentToken = lexer.getNextToken();
-        expression();
-        if (currentToken != Token::ParenthesisRight) {
-            throwError({Token::ParenthesisRight});
-        }
-        currentToken = lexer.getNextToken();
+// AstNode* SimplParser::loop() {
+//     if (currentToken == Token::KwWhile) {
+//         currentToken = lexer.getNextToken();
+//         if (currentToken != Token::ParenthesisLeft) {
+//             throwError({Token::ParenthesisLeft});
+//         }
+//         currentToken = lexer.getNextToken();
+//         expression();
+//         if (currentToken != Token::ParenthesisRight) {
+//             throwError({Token::ParenthesisRight});
+//         }
+//         currentToken = lexer.getNextToken();
 
-        if (currentToken != Token::KeyLeft) {
-            throwError({Token::KeyLeft});
-        }
-        currentToken = lexer.getNextToken();
+//         if (currentToken != Token::KeyLeft) {
+//             throwError({Token::KeyLeft});
+//         }
+//         currentToken = lexer.getNextToken();
 
-        statements();
-        if (currentToken != Token::KeyRight) {
-            throwError({Token::KeyRight});
-        }
-        currentToken = lexer.getNextToken();
-    } else if(currentToken == Token::KwFor){
-        currentToken = lexer.getNextToken();
+//         statements();
+//         if (currentToken != Token::KeyRight) {
+//             throwError({Token::KeyRight});
+//         }
+//         currentToken = lexer.getNextToken();
+//     } else if(currentToken == Token::KwFor){
+//         currentToken = lexer.getNextToken();
 
-        if(currentToken != Token::Ident) {
-            throwError({Token::Ident});
-        }
-        currentToken = lexer.getNextToken();
+//         if(currentToken != Token::Ident) {
+//             throwError({Token::Ident});
+//         }
+//         currentToken = lexer.getNextToken();
 
-        if(currentToken != Token::Assignment) {
-            throwError({Token::Assignment});
-        }
-        currentToken = lexer.getNextToken();
+//         if(currentToken != Token::Assignment) {
+//             throwError({Token::Assignment});
+//         }
+//         currentToken = lexer.getNextToken();
 
-        expression();
+//         expression();
 
-        if(currentToken != Token::KwTo) {
-            throwError({Token::KwTo});
-        }
+//         if(currentToken != Token::KwTo) {
+//             throwError({Token::KwTo});
+//         }
 
-        currentToken = lexer.getNextToken();
+//         currentToken = lexer.getNextToken();
 
-        expression();
+//         expression();
 
-        if(currentToken == Token::KwStep) {
-            currentToken = lexer.getNextToken();
-            expression();
-        }
+//         if(currentToken == Token::KwStep) {
+//             currentToken = lexer.getNextToken();
+//             expression();
+//         }
 
-        if(currentToken != Token::KeyLeft) {
-            throwError({Token::KeyLeft});
-        }
+//         if(currentToken != Token::KeyLeft) {
+//             throwError({Token::KeyLeft});
+//         }
         
-        currentToken = lexer.getNextToken();
-        statements();
+//         currentToken = lexer.getNextToken();
+//         statements();
 
-        if(currentToken != Token::KeyRight) {
-            throwError({Token::KeyRight});
-        }
+//         if(currentToken != Token::KeyRight) {
+//             throwError({Token::KeyRight});
+//         }
 
-        currentToken = lexer.getNextToken(); 
+//         currentToken = lexer.getNextToken(); 
 
-    }else {
-        throwError({Token::KwWhile, Token::KwFor});
-    }
-}
+//     }else {
+//         throwError({Token::KwWhile, Token::KwFor});
+//     }
+// }
 
-void SimplParser::arrayinitializer() {
+AstNode* SimplParser::arrayinitializer() {
     expression();
     while (currentToken == Token::Comma) {
         currentToken = lexer.getNextToken();
         expression();
     }
 }
-void SimplParser::type(){
+AstNode* SimplParser::type(){
     if(currentToken == Token::KwInt || currentToken == Token::KwBool){
         currentToken = lexer.getNextToken();
     }else{
@@ -495,15 +496,15 @@ void SimplParser::type(){
     }
 }
 
-void SimplParser::sizeExpression(){
+AstNode* SimplParser::sizeExpression(){
     expression();
 }
 
-void SimplParser::expression() {
+AstNode* SimplParser::expression() {
    booleanExpression();
 }
 
-void SimplParser :: booleanExpression(){
+AstNode* SimplParser :: booleanExpression(){
     booleanTerm();
     while (currentToken == Token::KwOr) {
         currentToken = lexer.getNextToken();
@@ -511,7 +512,7 @@ void SimplParser :: booleanExpression(){
     }
 }
 
-void SimplParser::booleanTerm() {
+AstNode* SimplParser::booleanTerm() {
     booleanFactor();
     while (currentToken == Token::kwAnd) {
         currentToken = lexer.getNextToken();
@@ -520,7 +521,7 @@ void SimplParser::booleanTerm() {
     
 }
 
-void SimplParser::booleanFactor() {
+AstNode* SimplParser::booleanFactor() {
     if(currentToken == Token::KwNot){
         currentToken = lexer.getNextToken();
         booleanFactor();
@@ -529,7 +530,7 @@ void SimplParser::booleanFactor() {
     relationalExpression();
 }
 
-void SimplParser::relationalExpression() {
+AstNode* SimplParser::relationalExpression() {
    arithmeticExpression();
    if(currentToken == Token::Equal || currentToken == Token::NotEqual ||
       currentToken == Token::LessThan || currentToken == Token::LessThanOrEqualTo ||
@@ -539,7 +540,7 @@ void SimplParser::relationalExpression() {
     }
 }
 
-void SimplParser::arithmeticExpression() {
+AstNode* SimplParser::arithmeticExpression() {
 
     term();
     while (currentToken == Token::Addition || currentToken == Token::Subtraction) {
@@ -563,7 +564,7 @@ void SimplParser::throwError(const std::vector<Token>& expectedTokens) {
 
 }
 
-void SimplParser::term(){
+AstNode* SimplParser::term(){
 
     factor();
 
@@ -574,7 +575,7 @@ void SimplParser::term(){
     
 }
 
-void SimplParser::factor(){
+AstNode* SimplParser::factor(){
 
     if(currentToken == Token::Addition || currentToken == Token::Subtraction){
         currentToken = lexer.getNextToken();
@@ -586,7 +587,7 @@ void SimplParser::factor(){
 
 }
 
-void SimplParser::primary(){
+AstNode* SimplParser::primary(){
 
     if(currentToken == Token::Number || currentToken == Token::KwTrue || currentToken == Token::KwFalse){
         currentToken = lexer.getNextToken();
