@@ -9,15 +9,15 @@ programNode* SimplParser::parse() {
     currentToken = lexer.getNextToken();
 
 
-    programNode *inn = program();
+    programNode *simplProgram = program();
 
     if (currentToken != Token::Eof)
     {
 
         throwError({Token::Eof});
     }
-    std::cout<< inn->toString()<<std::endl ;
-    return inn;
+    std::cout<< simplProgram->toString()<<std::endl ;
+    return simplProgram;
 }
 
 programNode* SimplParser::program() {
@@ -26,7 +26,6 @@ programNode* SimplParser::program() {
     while(currentToken == Token::KwLet || currentToken == Token::KwFn) {
         if(currentToken == Token::KwLet) {
             GlobalVarDeclNode* varDecl = globalVarDeclare();
-            std::cout << "Global variable declaration: " << varDecl->toString() << std::endl;
             if(varDecl) {
                 globalDeclarations.push_back(varDecl);
             }
@@ -199,6 +198,7 @@ Parameter* SimplParser::param() {
         currentToken = lexer.getNextToken();
 
         // Check if parameter is by reference
+        std::cout << "Current token: " << lexer.tokenToString(currentToken) << std::endl;
         bool isByReference = false;
         if(currentToken == Token::KwRef) {
             isByReference = true;
@@ -297,7 +297,7 @@ PrintStatement* SimplParser :: print(){
             throwError({Token :: ParenthesisLeft});
         }
         currentToken = lexer.getNextToken();
-        if(currentToken == Token::StringLiteral || currentToken == Token::Ident){
+        if(currentToken == Token::StringLiteral || currentToken == Token::Ident || currentToken == Token::Number) {
             identifier = lexer.text;
             currentToken = lexer.getNextToken();
 
@@ -366,7 +366,7 @@ AstNode* SimplParser::assignmentValues(){
         if(currentToken == Token::ParenthesisLeft) {
             currentToken = lexer.getNextToken();
 
-            std::vector<AstNode*> args = argumentList();
+            std::vector<ArgumentNode*> args = argumentList();
             if(currentToken != Token::ParenthesisRight) {
                 throwError({Token::ParenthesisRight});
             }
@@ -380,6 +380,7 @@ AstNode* SimplParser::assignmentValues(){
             return new FunctionCall(identifier, args);
         }
         else if(currentToken == Token::BracketLeft) {
+            isArray = true;
             currentToken = lexer.getNextToken();
             index = sizeExpression();
             if(currentToken != Token::BracketRight) {
@@ -395,24 +396,38 @@ AstNode* SimplParser::assignmentValues(){
                 throwError({Token::Semicolon});
             }
             currentToken = lexer.getNextToken();
-            
+            return new AssignStament(identifier, index, new Initializer(express), isArray);
+ 
         }
-        return new AssignStament(identifier, index, new Initializer(expression()), isArray);
 
+    return nullptr;
     }else{
         throwError({Token::Ident});
     }
     return nullptr;
 }
 
-std::vector<AstNode*> SimplParser::argumentList() {
-    std::vector<AstNode*> arguments;
+std::vector<ArgumentNode*> SimplParser::argumentList() {
+    std::vector<ArgumentNode*> arguments;
+    bool isRef = false;
 
-    arguments.push_back(expression());
+    if(currentToken == Token::KwRef){
+        isRef = true;
+       currentToken = lexer.getNextToken();
+    }
+
+    AstNode* expr = expression();
+    arguments.push_back(new ArgumentNode(expr, isRef));
 
     while (currentToken == Token::Comma) {
         currentToken = lexer.getNextToken();
-        arguments.push_back(expression());
+        isRef = false;
+        if(currentToken == Token::KwRef){
+            isRef = true;
+            currentToken = lexer.getNextToken();
+        }
+        expr = expression();
+        arguments.push_back(new ArgumentNode(expr, isRef));
     }
 
     return arguments;
@@ -453,7 +468,9 @@ ConditionalStatement* SimplParser::conditionalStatement() {
         std::vector<ElseIfStatement*> elseIfs;
         ElseStatement* elseStmt = nullptr;
 
+
         while (currentToken == Token::KwElse) {
+
             currentToken = lexer.getNextToken();
 
             if (currentToken == Token::KwIf) {
@@ -507,11 +524,13 @@ ConditionalStatement* SimplParser::conditionalStatement() {
                 }
                 currentToken = lexer.getNextToken();
                 elseStmt = new ElseStatement(elseBody);
+                return new ConditionalStatement(mainIf, elseIfs, elseStmt);
                 break;
             }
 
 
-        }     
+        }
+        std::cout<< "token actual " << lexer.tokenToString(currentToken) << std::endl;
         return new ConditionalStatement(mainIf, elseIfs, elseStmt);
     }else {
         throwError({Token::KwIf});
@@ -813,31 +832,34 @@ AstNode* SimplParser::primary(){
         if(currentToken == Token::ParenthesisLeft){
             currentToken = lexer.getNextToken();
             
-            std::vector<AstNode *> args = argumentList();
+            std::vector<ArgumentNode *> args = argumentList();
             if(currentToken != Token::ParenthesisRight) {
                 throwError({Token::ParenthesisRight});
             }  
             currentToken = lexer.getNextToken();
             return new FunctionCall(identifier, args);
         }
-        else if(currentToken == Token::KwReadInt || currentToken == Token::KwReadBool){
-            std::string functionName = lexer.text;
-            currentToken=lexer.getNextToken();
-            if(currentToken != Token::ParenthesisLeft){
-                throwError({Token::ParenthesisLeft});
-            }
-
-            currentToken = lexer.getNextToken();
-
-            if(currentToken != Token::ParenthesisRight){
-                throwError({Token::ParenthesisRight});
-            }
-            currentToken = lexer.getNextToken();
-            return new ReadFunctions(functionName);
-        }
 
         return new Variable(identifier);
-    }else if(currentToken == Token::ParenthesisLeft){
+
+    }
+    else if(currentToken == Token::KwReadInt || currentToken == Token::KwReadBool){
+        std::string functionName = lexer.text;
+        currentToken=lexer.getNextToken();
+        if(currentToken != Token::ParenthesisLeft){
+            throwError({Token::ParenthesisLeft});
+        }
+
+        currentToken = lexer.getNextToken();
+
+        if(currentToken != Token::ParenthesisRight){
+            throwError({Token::ParenthesisRight});
+        }
+        currentToken = lexer.getNextToken();
+        std::cout << "Read function called: " << lexer.tokenToString(currentToken) << std::endl;
+        return new ReadFunctions(functionName);
+    }
+    else if(currentToken == Token::ParenthesisLeft){
         currentToken = lexer.getNextToken();
         AstNode *expr = expression();
         if(currentToken != Token::ParenthesisRight) {

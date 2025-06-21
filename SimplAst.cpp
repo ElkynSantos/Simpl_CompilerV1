@@ -70,6 +70,10 @@ std::string ElseIfStatement::toString() const {
            + statements->toString() + "\n}";
 }
 
+std::string ArgumentNode::toString() const {
+   return (isRef ? "ref " : "") + expression->toString();
+}
+
 std::string ElseStatement::toString() const {
     return "else {\n" + statements->toString() + "\n}";
 }

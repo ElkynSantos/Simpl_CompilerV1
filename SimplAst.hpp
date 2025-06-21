@@ -50,6 +50,7 @@ class AssignStament;
 class ConditionalStatement;
 class ReturnStatement;
 class GlobalDeclaration;
+class ArgumentNode;
 
 
 
@@ -83,6 +84,7 @@ enum class NodeKind{
     elseStatement,
 
     ArgumentList,
+    Argument,
     ReturnStatement,
     Loop,
     whileStatement,
@@ -236,15 +238,13 @@ public:
     ElseStatement *elseStatement;
 };
 
-class IfStatement : public AstNode
-{
+class IfStatement : public AstNode {
+public:
+    IfStatement(AstNode *condition, AstNode *statements) 
+        : condition(condition), statements(statements) {}
 
-  public:
-    IfStatement(AstNode *condition, AstNode * statements) {}
-
-    NodeKind kind() const override
-    {
-      return NodeKind::ifStatement;
+    NodeKind kind() const override {
+        return NodeKind::ifStatement;
     }
 
     std::string toString() const override;
@@ -773,10 +773,23 @@ public:
   AstNode *indexExpr;
 };
 
+class ArgumentNode : public AstNode {
+public:
+    ArgumentNode(AstNode* expr, bool isRef = false) 
+        : expression(expr), isRef(isRef) {}
+
+    NodeKind kind() const override {
+        return NodeKind::Argument;
+    }
+
+    std::string toString() const override;
+    AstNode* expression;
+    bool isRef;
+};
 class FunctionCall : public AstNode
 {
 public:
-  FunctionCall(const std::string &name, const std::vector<AstNode *> &args)
+  FunctionCall(const std::string &name, const std::vector<ArgumentNode *> &args)
       : name(name), args(args) {}
 
   NodeKind kind() const override
@@ -787,7 +800,10 @@ public:
   std::string toString() const override;
 
   std::string name;
-  std::vector<AstNode *> args;
+  std::vector<ArgumentNode *> args;
 };
+
+
+
 
 #endif

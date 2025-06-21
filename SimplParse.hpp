@@ -30,7 +30,7 @@ class SimplParser {
         AstNode* primary();
 
         sizeExpressionNode* sizeExpression();
-        std::vector<AstNode*> argumentList();
+        std::vector<ArgumentNode*>  argumentList();
 
         GlobalFnDeclareNode* globalFnDeclare();
         ParameterList*  paramList();
