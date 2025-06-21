@@ -736,7 +736,7 @@ AstNode* SimplParser::arithmeticExpression() {
 
 void SimplParser::throwError(const std::vector<Token>& expectedTokens) {
     
-    std::string errorMessage = "Syntax Error, expected one of -> ";
+    std::string errorMessage = "Syntax Error in line get " + std::to_string(lexer.getLineNo()) + ", expected one of -> ";
     for (size_t i = 0; i < expectedTokens.size(); ++i) {
         errorMessage += "'" + lexer.tokenToString(expectedTokens[i]) + "'";
         if (i < expectedTokens.size() - 1) {

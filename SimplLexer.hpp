@@ -11,10 +11,13 @@ class SimplLexer {
         int pos;
         std::string input;
         std::string text;
-        SimplLexer(std::string input) : pos(0), input(input) {
+        SimplLexer(std::string input) : pos(0), input(input),line(0) {
             text = "";
             initKeywords();
         }
+        
+        unsigned getLineNo() { return line; }
+
         ~SimplLexer() = default;
         Token getNextToken();
         std::string tokenToString(Token tk);
@@ -23,6 +26,7 @@ class SimplLexer {
         std::optional<Token> keywordToken(const std::string& text);
         std::unordered_map<std::string, Token> keywords;
         void ungetChar(int ch);
+        int line;
         void reportError(int ch);
         void initKeywords();    
 

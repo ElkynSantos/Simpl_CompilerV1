@@ -11,7 +11,10 @@ int SimplLexer::getNextChar() {
     if (pos < input.length()) {
         int ch = input[pos];
         pos++;
-
+        if (ch == '\n')
+        {
+            line++;
+        }
         return ch;
     } else {
         return EOF;
@@ -20,6 +23,10 @@ int SimplLexer::getNextChar() {
 
 void SimplLexer::ungetChar(int ch) {
     if (pos > 0 && pos <= input.length() && ch != EOF) {
+        if (ch == '\n')
+        {
+            line--;
+        }
         pos --;
     }
 }
