@@ -199,7 +199,7 @@ std::string TypeNameNode::toString() const
 
 std::string sizeExpressionNode::toString() const
 {
-    return "SizeExpression: " + (expression ? expression->toString() : "null");
+    return "" + (expression ? expression->toString() : "null");
 }
 
 std::string EqualBoolean::toString() const

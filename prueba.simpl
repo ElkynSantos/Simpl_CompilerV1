@@ -1,11 +1,9 @@
 fn main() -> int
 {
-    let sum: int = 0;
+    let r1: int = 10 + 5 - 3 * 2 / 2 % 3;
+    let r2: int = -(-8) + 3;               
+    let r3: int = 7 * 6 / 3 % 4;            // 2
 
-    for i = 1 to 5 {          // 1 + 2 + 3 + 4 + 5
-        sum = sum + i;
-    }
-
-    print(sum);               // 15
+    print(r1); print(r2); print(r3);
     return 0;
 }

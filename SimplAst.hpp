@@ -484,7 +484,6 @@ public:
   AstNode *right;
 };
 
-// -------------------------------------------------------------------------
 class EqualBoolean : public BinaryExpr
 {
 public:
@@ -805,8 +804,5 @@ public:
   std::string name;
   std::vector<ArgumentNode *> args;
 };
-
-
-
 
 #endif

@@ -197,18 +197,14 @@ Parameter* SimplParser::param() {
         }
         currentToken = lexer.getNextToken();
 
-        // Check if parameter is by reference
-        std::cout << "Current token: " << lexer.tokenToString(currentToken) << std::endl;
         bool isByReference = false;
         if(currentToken == Token::KwRef) {
             isByReference = true;
             currentToken = lexer.getNextToken();
         }
        
-        // Get parameter type
         TypeNameNode* paramType = type();
 
-        // Handle array type
         sizeExpressionNode* arraySize = nullptr;
         if(currentToken == Token::BracketLeft) {
             currentToken = lexer.getNextToken();
@@ -530,7 +526,6 @@ ConditionalStatement* SimplParser::conditionalStatement() {
 
 
         }
-        std::cout<< "token actual " << lexer.tokenToString(currentToken) << std::endl;
         return new ConditionalStatement(mainIf, elseIfs, elseStmt);
     }else {
         throwError({Token::KwIf});
@@ -637,9 +632,9 @@ std::vector<AstNode*> SimplParser::arrayinitializer() {
 }
 TypeNameNode* SimplParser::type(){
     if(currentToken == Token::KwInt || currentToken == Token::KwBool){
-        
+        Token type = currentToken;
         currentToken = lexer.getNextToken();
-        return new TypeNameNode(currentToken  == Token::KwInt ? EnumVarType::Int : EnumVarType::Bool);
+        return new TypeNameNode(type  == Token::KwInt ? EnumVarType::Int : EnumVarType::Bool);
 
     }else{
         throwError({Token::KwInt, Token::KwBool});
@@ -769,10 +764,7 @@ AstNode* SimplParser::term(){
                 break;
             case Token::Module:
                 left = new ModExpr(left, right);
-                break;
         }
-        return left;
-
     }
     return left;   
 }
@@ -784,6 +776,15 @@ AstNode* SimplParser::factor(){
         Token currentOp = currentToken;
         currentToken = lexer.getNextToken();
         AstNode *expr = primary();
+
+        if (currentToken == Token::Addition)
+        {
+            return new UnaryAddExpr(expr);
+        }
+        else
+        {
+            return new UnarySubExpr(expr);
+        }
           
     }
 
@@ -856,7 +857,6 @@ AstNode* SimplParser::primary(){
             throwError({Token::ParenthesisRight});
         }
         currentToken = lexer.getNextToken();
-        std::cout << "Read function called: " << lexer.tokenToString(currentToken) << std::endl;
         return new ReadFunctions(functionName);
     }
     else if(currentToken == Token::ParenthesisLeft){
