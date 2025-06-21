@@ -777,7 +777,7 @@ AstNode* SimplParser::factor(){
         currentToken = lexer.getNextToken();
         AstNode *expr = primary();
 
-        if (currentToken == Token::Addition)
+        if (currentOp == Token::Addition)
         {
             return new UnaryAddExpr(expr);
         }
