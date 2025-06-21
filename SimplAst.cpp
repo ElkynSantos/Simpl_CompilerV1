@@ -13,7 +13,7 @@ std::string programNode::toString() const {
 }
 
 std::string GlobalFnDeclareNode::toString() const {
-    std::string result = "Function " + functionName + "(";
+    std::string result = "fn " + functionName + "(";
     if (parameters) {
         result += parameters->toString();
     }
@@ -26,7 +26,7 @@ std::string GlobalFnDeclareNode::toString() const {
 }
 
 std::string statementsNode::toString() const {
-    std::string result = "Statements:\n";
+    std::string result = "";
     for (const auto& stmt : statements) {
         result += "  " + stmt->toString() + "\n";
     }
@@ -186,7 +186,15 @@ std::string ReadFunctions::toString() const
 
 std::string TypeNameNode::toString() const
 {
-    return type;
+    switch (type)
+    {
+        case EnumVarType::Int:
+            return "Int";
+        case EnumVarType::Bool:
+            return "Bool";
+        default:
+            return "Unknown";
+    }
 }
 
 std::string sizeExpressionNode::toString() const

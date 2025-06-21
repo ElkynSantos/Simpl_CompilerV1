@@ -637,9 +637,9 @@ std::vector<AstNode*> SimplParser::arrayinitializer() {
 }
 TypeNameNode* SimplParser::type(){
     if(currentToken == Token::KwInt || currentToken == Token::KwBool){
-        std::string typeName = lexer.tokenToString(currentToken);
+        
         currentToken = lexer.getNextToken();
-        return new TypeNameNode(typeName);
+        return new TypeNameNode(currentToken  == Token::KwInt ? EnumVarType::Int : EnumVarType::Bool);
 
     }else{
         throwError({Token::KwInt, Token::KwBool});

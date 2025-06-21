@@ -55,10 +55,15 @@ class ArgumentNode;
 
 
 enum class EnumFunctionType{
-        Int,
-        Bool,
-        Void
+  Int,
+  Bool,
+  Void
 };
+enum class EnumVarType{
+  Int,
+  Bool,
+};
+
 
 enum class NodeKind{
     Program,
@@ -414,18 +419,16 @@ class GlobalVarDeclNode : public GlobalDeclaration
 };
 class TypeNameNode : public AstNode
 {
-  public:
-    TypeNameNode(const std::string &type) : type(type) {}
-
+   public:
+    TypeNameNode(EnumVarType type) : type(type) {}
     NodeKind kind() const override
     {
-      return NodeKind::TypeNameNode;
+      return NodeKind::TypeNameFunctionNode;
     }
-
+    
     std::string toString() const override;
 
-    std::string type;
-
+    EnumVarType type;
 };
 class sizeExpressionNode : public AstNode
 {
