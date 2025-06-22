@@ -5,7 +5,7 @@
 #include <vector>
 #include "SimplLexer.hpp"
 #include "SimplAst.hpp"
-
+#include "SimplEvaluator.hpp"
 
 class SimplParser {
     public:

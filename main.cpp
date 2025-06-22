@@ -22,7 +22,7 @@ int main(int argc, char* argv[]) {
   SimplParser parser(lexer);
 
   if(parser.parse()){
-    std::cout<<"Syntax correct" << std::endl;
+    std::cout<<"===============================SUCCESSFULL====================================" << std::endl;
   }
   return 0;
 }

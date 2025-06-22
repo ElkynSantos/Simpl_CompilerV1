@@ -16,7 +16,8 @@ programNode* SimplParser::parse() {
 
         throwError({Token::Eof});
     }
-    std::cout<< simplProgram->toString()<<std::endl ;
+    SimplEvaluator evaluator;
+    evaluator.evaluate(simplProgram);
     return simplProgram;
 }
 
@@ -49,7 +50,7 @@ GlobalVarDeclNode* SimplParser :: globalVarDeclare(){
     std::string identifier;
     TypeNameNode* typeNode = nullptr;
     sizeExpressionNode* sizeExpressionArray = nullptr;
-    AstNode* initializer = nullptr;
+    Initializer* initializer = nullptr;
     bool isArray = false;
     if( currentToken == Token::KwLet){
        
@@ -73,7 +74,7 @@ GlobalVarDeclNode* SimplParser :: globalVarDeclare(){
         }
         else if(currentToken == Token::Assignment){
             currentToken = lexer.getNextToken();
-            initializer = expression();
+            initializer = new Initializer(expression());
             if(currentToken != Token::Semicolon) {
                 throwError({Token::Semicolon});
             
@@ -285,28 +286,26 @@ AstNode* SimplParser::statement(){
 }
 
 PrintStatement* SimplParser :: print(){
-    std::string identifier;
-    sizeExpressionNode* express = nullptr;
+    std::string identifier = "";
+    AstNode* express = nullptr;
+    sizeExpressionNode* sExpress = nullptr;
+    bool isStringLiteral = false;
     if(currentToken == Token::KwPrint){
         currentToken = lexer.getNextToken();
         if(currentToken != Token::ParenthesisLeft){
             throwError({Token :: ParenthesisLeft});
         }
         currentToken = lexer.getNextToken();
-        if(currentToken == Token::StringLiteral || currentToken == Token::Ident || currentToken == Token::Number) {
+        if(currentToken == Token::StringLiteral) {
+            isStringLiteral = true;
             identifier = lexer.text;
             currentToken = lexer.getNextToken();
 
-            if(currentToken == Token::BracketLeft){
-                currentToken = lexer.getNextToken();
-                express = sizeExpression();
-                if(currentToken != Token::BracketRight){
-                    throwError({Token :: BracketRight});
-                }
-                currentToken = lexer.getNextToken();
-
-            }
-        }else{
+            
+        }else if(currentToken == Token::Ident || currentToken == Token::Number){
+            express = expression();
+        }
+        else{
             throwError({Token :: StringLiteral, Token::Ident});
         }
 
@@ -321,7 +320,7 @@ PrintStatement* SimplParser :: print(){
         }
         currentToken = lexer.getNextToken();
         
-        return new PrintStatement(identifier, express);
+        return new PrintStatement(identifier, express, isStringLiteral);
     }else{
         throwError({Token :: KwPrint});
 
@@ -412,7 +411,7 @@ std::vector<ArgumentNode*> SimplParser::argumentList() {
        currentToken = lexer.getNextToken();
     }
 
-    AstNode* expr = expression();
+    AstNode* expr = expression();    
     arguments.push_back(new ArgumentNode(expr, isRef));
 
     while (currentToken == Token::Comma) {
@@ -422,7 +421,7 @@ std::vector<ArgumentNode*> SimplParser::argumentList() {
             isRef = true;
             currentToken = lexer.getNextToken();
         }
-        expr = expression();
+        expr = expression();    
         arguments.push_back(new ArgumentNode(expr, isRef));
     }
 

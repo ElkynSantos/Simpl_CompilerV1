@@ -1,9 +1,13 @@
 fn main() -> int
 {
-    let r1: int = 10 + 5 - 3 * 2 / 2 % 3;
-    let r2: int = -(-8) + 3;               
-    let r3: int = 7 * 6 / 3 % 4;            // 2
+    let n: int = 5;
+    let fact: int = 1;
 
-    print(r1); print(r2); print(r3);
+    while (n > 1) {
+        fact = fact * n;
+        n = n - 1;
+    }
+
+    print(fact); // 120
     return 0;
 }

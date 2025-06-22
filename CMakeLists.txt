@@ -20,6 +20,7 @@ set(PROJECT_GENERATED_FILES SimplLexer.cpp
                             tokens.hpp
                             SimplParse.cpp
                             SimplAst.cpp
+                            SimplEvaluator.cpp
 )
 
 add_executable(SimplCompiler ${PROJECT_SOURCE_FILES}

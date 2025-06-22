@@ -94,9 +94,14 @@ std::string ForStament::toString() const {
 }
 
 std::string PrintStatement::toString() const {
-    std::string result = "print(" + identifier;
-    if (sizeExpression) {
-        result += "[" + sizeExpression->toString() + "]";
+    std::string result = "print(";
+    if (!identifier.empty()) {
+        result += identifier;
+    }else if(expression) {
+        result += expression->toString();
+    }
+    else {
+        result += "null";
     }
     result += ")";
     return result;
@@ -175,7 +180,7 @@ std::string Initializer::toString() const {
         result += "]";
         return result;
     } else {
-        return "Initializer(Expression): " + (expression ? expression->toString() : "null");
+        return "" + (expression ? expression->toString() : "null");
     }
 }
 

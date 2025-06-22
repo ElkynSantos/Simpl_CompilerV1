@@ -72,30 +72,20 @@ enum class NodeKind{
     TypeNameFunctionNode,
     SizeExpression,
     Initializer,
-    ArrayInitializer,
-    Expression,
-    Term,
-    Factor,
-    Primary,
     GlobalFnDeclare,
     ParameterList,
     Parameter,
-    FunctionTypes,
     Statements,
-    Statement,
     ConditionalStatement,
     ifStatement,
     elseIfStatement,
     elseStatement,
-
     ArgumentList,
     Argument,
     ReturnStatement,
-    Loop,
     whileStatement,
     forStatement,
     AssignmentValues,
-     // Booleans Binary
     EqualBoolean,
     NEqualBoolean,
     Less_ThanBoolean,
@@ -106,7 +96,6 @@ enum class NodeKind{
     AndBoolean,
     EqualExpr,
     UnaryNotBoolean,
-
     SumExpr,
     SubExpr,
     MulExpr,
@@ -115,6 +104,7 @@ enum class NodeKind{
     UnaryAddExpr,
     UnarySubExpr,
     IntConst,
+    BooleanConst,
     Variable,
     ArrayVariable,
     FunctionCall,
@@ -329,8 +319,8 @@ class ForStament : public AstNode
 class PrintStatement : public AstNode
 {
   public:
-    PrintStatement(std::string& identifier, sizeExpressionNode* sizeExpression) : identifier(identifier)
-    ,sizeExpression(sizeExpression) {}
+    PrintStatement(std::string& identifier, AstNode* expression = nullptr, bool isStringLiteral = false) 
+      : identifier(identifier), expression(expression), isStringLiteral(isStringLiteral) {}
 
     NodeKind kind() const override
     {
@@ -340,7 +330,8 @@ class PrintStatement : public AstNode
     std::string toString() const override;
   
     std::string identifier;
-    sizeExpressionNode* sizeExpression;
+    AstNode* expression = nullptr;
+    bool isStringLiteral = false;
     };
 
 
@@ -399,7 +390,7 @@ class Parameter : public AstNode
 class GlobalVarDeclNode : public GlobalDeclaration
 {
   public:
-  GlobalVarDeclNode(const std::string& identifier, TypeNameNode* type, sizeExpressionNode* sizeExpression, AstNode* initializer, bool isArray)
+  GlobalVarDeclNode(const std::string& identifier, TypeNameNode* type, sizeExpressionNode* sizeExpression, Initializer* initializer, bool isArray)
         : identifier(identifier), 
         type(type), sizeExpression(sizeExpression), initializer(initializer), isArray(isArray) {}
   
@@ -414,7 +405,7 @@ class GlobalVarDeclNode : public GlobalDeclaration
   std::string identifier;
   TypeNameNode* type;
   sizeExpressionNode* sizeExpression;
-  AstNode* initializer;
+  Initializer* initializer;
   bool isArray;
 };
 class TypeNameNode : public AstNode
@@ -705,7 +696,7 @@ public:
 
   NodeKind kind() const override
   {
-    return NodeKind::IntConst;
+    return NodeKind:: BooleanConst;
   }
 
   std::string toString() const override;
