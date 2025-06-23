@@ -25,7 +25,7 @@ int SimplEvaluator::evaluate(AstNode* node) {
             {
                 throw std::runtime_error("Please Define a principal (main) function");
             }
-            enterFunctionScope("main");
+
             evaluate(it->second->functionBody);
 
             return 1;
@@ -61,7 +61,7 @@ int SimplEvaluator::evaluate(AstNode* node) {
                 if (isVariableDefined(identifier)) {
                     throw std::runtime_error("Variable '" + identifier + "' is already defined.");
                 }
-                currentScope->arrays[identifier] = std::vector<std::optional<Value>>(Sizevalue, std::nullopt);
+                arrays[identifier] = std::vector<std::optional<Value>>(Sizevalue, std::nullopt);
                 if(varDecl -> initializer){
                     if(varDecl->type->type == EnumVarType::Int) {
                         if(varDecl->initializer->isArray) {
@@ -71,7 +71,7 @@ int SimplEvaluator::evaluate(AstNode* node) {
                             }
                             for (size_t i = 0; i < arrayValues.size(); ++i) {
                                 int value = evaluate(arrayValues[i]);
-                                currentScope->arrays[identifier][i] = Value(value);
+                                arrays[identifier][i] = Value(value);
                             }
                         } else {
                              const auto &arrayValues = varDecl->initializer->arrayExpressions;
@@ -84,7 +84,7 @@ int SimplEvaluator::evaluate(AstNode* node) {
                                 if (value < 0) {
                                     throw std::runtime_error("Invalid value for array element '" + identifier + "[" + std::to_string(i) + "]'. Value must be non-negative.");
                                 }
-                                currentScope->arrays[identifier][i] = Value(value);
+                                arrays[identifier][i] = Value(value);
                             }   
                         }
                        
@@ -99,14 +99,14 @@ int SimplEvaluator::evaluate(AstNode* node) {
                                 if(value > 1 && value < 0){
                                     throw std::runtime_error("Invalid boolean value for variable '" + identifier + "[" + std::to_string(i) + "]'. Expected true or false.");
                                 }
-                                currentScope->arrays[identifier][i] = Value(value == 1 ? true : false);;
+                                arrays[identifier][i] = Value(value == 1 ? true : false);;
                             }
                         } else {
                             int value = evaluate(varDecl->initializer->expression);
                             if(value > 1 && value < 0){
                                 throw std::runtime_error("Invalid boolean value for variable '" + identifier + "'. Expected true or false.");
                             }
-                            currentScope->arrays[identifier][0] = Value(value == 1 ? true : false);
+                            arrays[identifier][0] = Value(value == 1 ? true : false);
                         }
 
                     }
@@ -120,21 +120,21 @@ int SimplEvaluator::evaluate(AstNode* node) {
                 }
                 
                 if (varDecl->type->type == EnumVarType::Int) {
-                    currentScope->variables[identifier] = std::nullopt;
+                    variables[identifier] = std::nullopt;
                 } else if (varDecl->type->type == EnumVarType::Bool) {
-                    currentScope->variables[identifier] = std::nullopt;
+                    variables[identifier] = std::nullopt;
                 }
                 if(varDecl->initializer){
                     
                     if(varDecl->type->type == EnumVarType::Int) {
                         int value = evaluate(varDecl->initializer->expression);
-                        currentScope->variables[identifier] = Value(value);
+                        variables[identifier] = Value(value);
                     } else if (varDecl->type->type == EnumVarType::Bool) {
                        int value = evaluate(varDecl->initializer->expression);
                         if(value > 1 && value < 0){
                             throw std::runtime_error("Invalid boolean value for variable '" + identifier + "'. Expected true or false.");
                         }
-                        currentScope->variables[identifier] = Value(value == 1 ? true : false);
+                        variables[identifier] = Value(value == 1 ? true : false);
                     } 
                 }
                 
@@ -238,6 +238,21 @@ int SimplEvaluator::evaluate(AstNode* node) {
             const auto *intNode = static_cast<const IntConst *>(node);
             return intNode->value;
         }
+        case NodeKind::Parameter:{
+            const auto *paramNode = static_cast<const Parameter *>(node);
+            if (paramNode->sizeExpression) {
+                int size = evaluate(paramNode->sizeExpression->expression);
+                if (size <= 0) {
+                    throw std::runtime_error("Invalid array size for parameter '" + paramNode->identifier + "'. Size must be greater than 0.");
+                }
+            }
+            if (paramNode->isRef) {
+                if (!isVariableDefined(paramNode->identifier)) {
+                    throw std::runtime_error("Parameter '" + paramNode->identifier + "' is not defined.");
+                }
+            } 
+            return 0;
+        }
         case NodeKind::Variable:
         {
             const auto *varNode = static_cast<const Variable *>(node);
@@ -245,9 +260,8 @@ int SimplEvaluator::evaluate(AstNode* node) {
             if (!isVariableDefined(identifier)) {
                 throw std::runtime_error("Variable '" + identifier + "' is not defined.");
             }
-
-            auto it = currentScope->variables.find(identifier);
-            if (it != currentScope->variables.end() && it->second.has_value()) {
+            auto it = variables.find(identifier);
+            if (it != variables.end() && it->second.has_value()) {
                 return it->second->intVal;
             } else {
                 throw std::runtime_error("Variable '" + identifier + "' is not initialized.");
@@ -266,29 +280,31 @@ int SimplEvaluator::evaluate(AstNode* node) {
             if (callNode->args.size() != fnDecl->parameters->parameterList.size()) {
                 throw std::runtime_error("Incorrect number of arguments for function '" + callNode->name + "'");
             }
-
-            Scope* previousScope = currentScope;
-            lastFunction = lastFunction != currentFunction ? currentFunction : lastFunction;
-            enterFunctionScope(callNode->name);
-            for (size_t i = 0; i < callNode->args.size(); ++i) {
-                const auto* param = fnDecl->parameters->parameterList[i];
+        
+            auto previousVariables = variables;
+            auto previousArrays = arrays;
+             for (size_t i = 0; i < callNode->args.size(); ++i)
+            {
+               const auto* param = fnDecl->parameters->parameterList[i];
                 const auto* arg = callNode->args[i];
                 
                 if (arg->expression->kind() == NodeKind::Variable) {
                     const auto* varNode = static_cast<const Variable*>(arg->expression);
                     
-                    if (previousScope->variables.find(varNode->name) != previousScope->variables.end()) {
+                    if (variables.find(varNode->name) != variables.end()) {
                         if (param->isRef) {
-                            currentScope->variables[param->identifier] = previousScope->variables[varNode->name];
+                            variables[param->identifier] = variables[varNode->name];
+                            variablesRef[param->identifier] = variables[param->identifier];
                         } else {
-                            currentScope->variables[param->identifier] = previousScope->variables[varNode->name];
+                            variables[param->identifier] = variables[varNode->name];
                         }
                     }
-                    else if (previousScope->arrays.find(varNode->name) != previousScope->arrays.end()) {
+                    else if (arrays.find(varNode->name) != arrays.end()) {
                         if (param->isRef) {
-                            currentScope->arrays[param->identifier] = previousScope->arrays[varNode->name];
+                            arrays[param->identifier] = arrays[varNode->name];
+                            arraysRef[param->identifier] = arrays[param->identifier];
                         } else {
-                            currentScope->arrays[param->identifier] = previousScope->arrays[varNode->name];
+                           arrays[param->identifier] = arrays[varNode->name];
                         }
                     } else {
                         throw std::runtime_error("Variable '" + varNode->name + "' not defined");
@@ -299,8 +315,8 @@ int SimplEvaluator::evaluate(AstNode* node) {
                         throw std::runtime_error("Cannot pass individual array elements by reference");
                     }
                     
-                    auto arrayIt = previousScope->arrays.find(arrayVarNode->name);
-                    if (arrayIt == previousScope->arrays.end()) {
+                    auto arrayIt = arrays.find(arrayVarNode->name);
+                    if (arrayIt == arrays.end()) {
                         throw std::runtime_error("Array '" + arrayVarNode->name + "' not found");
                     }
 
@@ -314,49 +330,56 @@ int SimplEvaluator::evaluate(AstNode* node) {
                     }
 
                     Value arrayElement = arrayIt->second[index].value();
-                    currentScope->variables[param->identifier] = arrayElement;
+                    variables[param->identifier] = arrayElement;
                 }
                 else {
                     Value argValue = evaluate(arg->expression);
-                    currentScope->variables[param->identifier] = argValue;
+                    variables[param->identifier] = argValue;
                 }
             }
-
+            variables = variables;
+            arrays = arrays;
             Value result = evaluate(fnDecl->functionBody);
+            
 
-              for (size_t i = 0; i < callNode->args.size(); ++i) {
-                const auto* param = fnDecl->parameters->parameterList[i];
-                const auto* arg = callNode->args[i];               
-                if (arg->expression->kind() == NodeKind::Variable) {
-                    const auto* varNode = static_cast<const Variable*>(arg->expression);
-                    if (currentScope->variables.find(param->identifier) != currentScope->variables.end()) {
-                        if (param->isRef) {
-                            previousScope->variables[varNode->name] = currentScope->variables[param->identifier];
-                        } else {
-                            previousScope->variables[varNode->name] = currentScope->variables[param->identifier];
-                        }
-                    }else if(currentScope->arrays.find(param->identifier) != currentScope->arrays.end()) {
-                        if (param->isRef) {
-                            previousScope->arrays[varNode->name] = currentScope->arrays[param->identifier];
-                        } else {
-                            previousScope->arrays[varNode->name] = currentScope->arrays[param->identifier];
-                        }
+            for (size_t i = 0; i < callNode->args.size(); ++i) {
+                const auto* paramDecl = static_cast<const Parameter*>(fnDecl->parameters->parameterList[i]);
+                const auto* argNode = callNode->args[i];
+
+                if (paramDecl->isRef && argNode->expression->kind() == NodeKind::Variable) {
+                    const auto* varNode = static_cast<const Variable*>(argNode->expression);
+                    
+                    if (variables.find(varNode->name) != variables.end()) {
+                        variablesRef[paramDecl->identifier] = variables[paramDecl->identifier];
                     }
-                } else if (arg->expression->kind() == NodeKind::ArrayVariable) {
-                    const auto* arrayVarNode = static_cast<const ArrayVariable*>(arg->expression);
-                    if (currentScope->arrays.find(param->identifier) != currentScope->arrays.end()) {
-                        if(param->isRef) {
-                            previousScope->arrays[arrayVarNode->name] = currentScope->arrays[param->identifier];
-                        } else {
-                            previousScope->arrays[arrayVarNode->name] = currentScope->arrays[param->identifier];
-                        }
+                    else if (arrays.find(varNode->name) != arrays.end()) {
+                        arraysRef[paramDecl->identifier] = arrays[paramDecl->identifier];
                     }
                 }
             }
-            
-            currentScope = previousScope;
-            enterFunctionScope(lastFunction);
 
+            variables = previousVariables;
+            arrays = previousArrays;
+
+            for (size_t i = 0; i < callNode->args.size(); ++i) {
+                const auto* paramDecl = static_cast<const Parameter*>(fnDecl->parameters->parameterList[i]);
+                const auto* argNode = callNode->args[i];
+
+                if (paramDecl->isRef && argNode->expression->kind() == NodeKind::Variable) {
+                    const auto* varNode = static_cast<const Variable*>(argNode->expression);
+                    
+                    if (variables.find(varNode->name) != variables.end()) {
+                        variables[varNode->name] = variablesRef[paramDecl->identifier];
+                    }
+                    else if (arrays.find(varNode->name) != arrays.end()) {
+                        arrays[varNode->name] = arraysRef[paramDecl->identifier];
+                    }
+                }
+            }
+
+            variablesRef.clear();
+            arraysRef.clear();
+            
             return result.intVal;
         }
         case NodeKind::ArrayVariable:
@@ -369,15 +392,15 @@ int SimplEvaluator::evaluate(AstNode* node) {
                 throw std::runtime_error("Array variable '" + identifier + "' is not defined.");
             }
 
-            auto it = currentScope->arrays.find(identifier);
-            if (it != currentScope->arrays.end()) {
+            auto it = arrays.find(identifier);
+            if (it != arrays.end()) {
                 int index = evaluate(indexExpr);
 
                 if (index < 0 || index >= it->second.size()) {
                     throw std::runtime_error("Index out of bounds for array variable '" + identifier + "'.");
                 }
                 if(!it->second[index].has_value()) {
-                    throw std::runtime_error("Array variable '" + identifier + "' does not contain int values.");
+                    throw std::runtime_error("Array variable '" + identifier + "' does not contain values.");
                 }
                 Value arrayValue = it->second[index].value();
 
@@ -392,13 +415,12 @@ int SimplEvaluator::evaluate(AstNode* node) {
                 std::cout << printStmtNode->identifier << std::endl;
             } else if (printStmtNode->expression) {
                 int value = evaluate(printStmtNode->expression);
-
                 if (printStmtNode->expression->kind() == NodeKind::Variable) {
                     const auto *varNode = static_cast<const Variable *>(printStmtNode->expression);
                     const std::string &identifier = varNode->name;
 
-                    auto it = currentScope->variables.find(identifier);
-                    if (it != currentScope->variables.end() && it->second.has_value()) {
+                    auto it = variables.find(identifier);
+                    if (it != variables.end() && it->second.has_value()) {
                         Value varValue = it->second.value();
                         if (varValue.type == Value::Int) {
                             std::cout << varValue.intVal << std::endl;
@@ -413,9 +435,9 @@ int SimplEvaluator::evaluate(AstNode* node) {
                     const auto *arrayVarNode = static_cast<const ArrayVariable *>(printStmtNode->expression);
                     const std::string &identifier = arrayVarNode->name;
                     AstNode *indexExpr = arrayVarNode->indexExpr;
-                    auto it = currentScope->arrays.find(identifier);
+                    auto it = arrays.find(identifier);
                     
-                    if (it != currentScope->arrays.end()) {
+                    if (it != arrays.end()) {
                         int index = evaluate(indexExpr);
                         Value arrayValue = it->second[index].value();
                         if (arrayValue.type == Value::Int) {
@@ -429,7 +451,7 @@ int SimplEvaluator::evaluate(AstNode* node) {
                 }else{
                     std::cout << value << std::endl;
                 }
-              
+                
             } else {
                 throw std::runtime_error("Print statement has no expression or identifier.");
             }
@@ -446,7 +468,7 @@ int SimplEvaluator::evaluate(AstNode* node) {
                     }
                     
                     int index = evaluate(assignNode->index);
-                    auto& array = currentScope->arrays[assignNode->identifier];
+                    auto& array = arrays[assignNode->identifier];
                     
                     if (index < 0 || index >= array.size()) {
                         throw std::runtime_error("Index out of bounds for array variable '" + assignNode->identifier + "'.");
@@ -470,7 +492,7 @@ int SimplEvaluator::evaluate(AstNode* node) {
                            assignValue = Value(value);
                         }
                     }
-                    currentScope->arrays[assignNode->identifier][index] = assignValue;
+                    arrays[assignNode->identifier][index] = assignValue;
                     
 
                 } else {
@@ -481,8 +503,8 @@ int SimplEvaluator::evaluate(AstNode* node) {
                     throw std::runtime_error("Variable '" + assignNode->identifier + "' is not defined.");
                 }
 
-                auto it = currentScope->variables.find(assignNode->identifier);
-                if (it != currentScope->variables.end() && it->second.has_value()) {
+                auto it = variables.find(assignNode->identifier);
+                if (it != variables.end() && it->second.has_value()) {
                     Value currentValue = it->second.value();
 
                 }
@@ -499,7 +521,7 @@ int SimplEvaluator::evaluate(AstNode* node) {
                 } else if(it->second->type == Value::Int) {
                     assignValue = Value(assignValue.intVal);
                 }
-                currentScope->variables[assignNode->identifier] = assignValue;
+                variables[assignNode->identifier] = assignValue;
             }
             
             return assignValue.type == Value::Int ? assignValue.intVal : assignValue.boolVal;
@@ -537,15 +559,15 @@ int SimplEvaluator::evaluate(AstNode* node) {
             if (isVariableDefined(forNode->identifier)) {
                 throw std::runtime_error("Loop variable '" + forNode->identifier + "' is already defined.");
             }
-            currentScope->variables[forNode->identifier] = Value(evaluate(forNode->startExpr));
+            variables[forNode->identifier] = Value(evaluate(forNode->startExpr));
             if(forNode->stepExpr) {
                 step = evaluate(forNode->stepExpr);
             }
-            int valueInitial = currentScope->variables[forNode->identifier]->intVal;
+            int valueInitial = variables[forNode->identifier]->intVal;
             int valueEnd = evaluate(forNode->endExpr);
-            while (currentScope->variables[forNode->identifier]->intVal <= evaluate(forNode->endExpr)) {
+            while (variables[forNode->identifier]->intVal <= evaluate(forNode->endExpr)) {
                 result = evaluate(forNode->body);
-                currentScope->variables[forNode->identifier]->intVal += step;
+                variables[forNode->identifier]->intVal += step;
             }
             return result;
         }
@@ -554,13 +576,14 @@ int SimplEvaluator::evaluate(AstNode* node) {
             int result = 0;
             result = evaluate(condNode->ifStatement);
             if (result != 0) {
-                return result; 
+
+                return evaluate(condNode->ifStatement->statements); 
             }
 
             for (const auto &elseIf : condNode->elseIfStatements) {
                 result = evaluate(elseIf);
                 if (result != 0) {
-                    return result;
+                    return evaluate(elseIf->statements);
                 }
             }
 
@@ -573,7 +596,6 @@ int SimplEvaluator::evaluate(AstNode* node) {
         case NodeKind::ifStatement: {
             const auto *ifNode = static_cast<const IfStatement *>(node);
             if (evaluate(ifNode->condition)) {
-                evaluate(ifNode->statements);
                 return 1;
             }
             return 0;
@@ -581,7 +603,6 @@ int SimplEvaluator::evaluate(AstNode* node) {
         case NodeKind::elseIfStatement: {
             const auto *elseIfNode = static_cast<const ElseIfStatement *>(node);
             if (evaluate(elseIfNode->condition)) {
-                evaluate(elseIfNode->statements);
                 return 1;
             }
             return 0;
@@ -589,7 +610,7 @@ int SimplEvaluator::evaluate(AstNode* node) {
         case NodeKind::elseStatement: {
             const auto *elseNode = static_cast<const ElseStatement *>(node);
             int value = evaluate(elseNode->statements);
-            return 1; // Return a non-zero value to indicate the else block was executed
+            return value;
         }
         case NodeKind::ReadFunctions: {
             int value;
@@ -634,74 +655,11 @@ int SimplEvaluator::evaluate(AstNode* node) {
 
 
 bool SimplEvaluator::isVariableDefined(const std::string& identifier) const {
-    auto currentVars = varsByFunctions.at(currentFunction);
-    if (currentVars->variables.find(identifier) != currentVars->variables.end() ||
-        currentVars->arrays.find(identifier) != currentVars->arrays.end()) {
+    if (variables.find(identifier) !=variables.end() ||
+        arrays.find(identifier) != arrays.end()) {
         return true;
     }
 
-    if (currentFunction != "global") {
-        auto globalVars = varsByFunctions.at("global");
-        if (globalVars->variables.find(identifier) != globalVars->variables.end() ||
-            globalVars->arrays.find(identifier) != globalVars->arrays.end()) {
-            return true;
-        }
-    }
 
     return false;
-}
-
-void SimplEvaluator::enterFunctionScope(const std::string& functionName) {
-    currentFunction = functionName;
-    if (varsByFunctions.find(functionName) == varsByFunctions.end()) {
-        varsByFunctions[functionName] = new Scope();
-    }
-    currentScope = varsByFunctions[functionName];
-}
-
-void SimplEvaluator::printScope(const std::string& scopeName) const {
-    const Scope* scope = scopeName.empty() ? currentScope : varsByFunctions.at(scopeName);
-    
-    std::cout << "\n=== Scope: " << (scopeName.empty() ? currentFunction : scopeName) << " ===\n";
-    
-    std::cout << "Variables:\n";
-    for (const auto& [name, value] : scope->variables) {
-        std::cout << "  " << name << " = ";
-        if (!value.has_value()) {
-            std::cout << "null\n";
-            continue;
-        }
-        
-        const Value& val = value.value();
-        if (val.type == Value::Int) {
-            std::cout << val.intVal << " (int)\n";
-        } else {
-            std::cout << (val.boolVal ? "true" : "false") << " (bool)\n";
-        }
-    }
-    
-    std::cout << "Arrays:\n";
-    for (const auto& [name, array] : scope->arrays) {
-        std::cout << "  " << name << "[" << array.size() << "] = {";
-        for (size_t i = 0; i < array.size(); ++i) {
-            if (i > 0) std::cout << ", ";
-            if (!array[i].has_value()) {
-                std::cout << "null";
-                continue;
-            }
-            
-            const Value& val = array[i].value();
-            if (val.type == Value::Int) {
-                std::cout << val.intVal;
-            } else {
-                std::cout << (val.boolVal ? "true" : "false");
-            }
-        }
-        std::cout << "}\n";
-    }
-    std::cout << "=====================\n";
-}
-void SimplEvaluator::exitFunctionScope() {
-    currentFunction = "global";
-    currentScope = varsByFunctions["global"];
 }

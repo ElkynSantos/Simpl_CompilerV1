@@ -22,6 +22,15 @@ fn fill(arr: ref int[3], value: int) -> void
     }
 }
 
+fn factorial(n:int) -> int {
+    if(n<=1){
+        return 1;
+    }else{
+        return n * factorial(n -1);
+    }
+
+}
+
 fn main() -> int
 {
     let p: int = 5;
@@ -38,10 +47,11 @@ fn main() -> int
     print(ok);
 
     fill(ref data, 7);
-
+    let x: int = factorial(5);
     print(data[0]);
     print(data[1]);
     print(data[2]);
+    print(x);
 
     return 0;
 }

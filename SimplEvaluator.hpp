@@ -16,35 +16,25 @@ struct Value {
     Value(bool v) : type(Bool), boolVal(v) {}
 };
 
-struct Scope {
-    std::unordered_map<std::string, std::optional<Value>> variables;
-    std::unordered_map<std::string, std::vector<std::optional<Value>>> arrays;
-};
 
 class SimplEvaluator {
     public:
-    SimplEvaluator() {
-        currentScope = new Scope();
-        varsByFunctions["global"] = currentScope;
-    }
+    SimplEvaluator() {}
     
-    ~SimplEvaluator() {
-        for (auto& pair : varsByFunctions) {
-            delete pair.second;
-        }
-    }
-    Scope* currentScope;
-    std::string currentFunction = "global";
-    std::string lastFunction = "";
+    ~SimplEvaluator() = default;
     int evaluate(AstNode* node);
+
     bool isVariableDefined(const std::string& identifier) const;
     void enterFunctionScope(const std::string& functionName);
     void exitFunctionScope();
     void printScope(const std::string& scopeName = "") const;
 
     private:
-    std::unordered_map<std::string, Scope*> varsByFunctions;
     std::unordered_map<std::string, const GlobalFnDeclareNode *> methodTable;
+    std::unordered_map<std::string, std::optional<Value>> variables;
+    std::unordered_map<std::string, std::vector<std::optional<Value>>> arrays;
+    std::unordered_map<std::string, std::optional<Value>> variablesRef;
+    std::unordered_map<std::string, std::vector<std::optional<Value>>> arraysRef;
     
 
 };
