@@ -16,7 +16,7 @@ int SimplEvaluator::evaluate(AstNode* node) {
                 if (decl->kind() == NodeKind::GlobalFnDeclare) {
                     const auto *fnDecl = static_cast<const GlobalFnDeclareNode*>(decl);
                     methodTable[fnDecl->functionName] = fnDecl;
-                }else if(decl->kind() == NodeKind::GlobalFnDeclare){
+                }else if(decl->kind() == NodeKind::GlobalVarDeclare) {
                     evaluate(decl);
                 }
             }
@@ -81,7 +81,6 @@ int SimplEvaluator::evaluate(AstNode* node) {
                             for (size_t i = 0; i < arrayValues.size(); ++i) {
 
                                 int value = evaluate(arrayValues[i]);
-                                std::cout << "Value: " << value << std::endl;
                                 if (value < 0) {
                                     throw std::runtime_error("Invalid value for array element '" + identifier + "[" + std::to_string(i) + "]'. Value must be non-negative.");
                                 }
@@ -97,17 +96,17 @@ int SimplEvaluator::evaluate(AstNode* node) {
                             }
                             for (size_t i = 0; i < arrayValues.size(); ++i) {
                                 int value = evaluate(arrayValues[i]);
-                                if(value > 1){
+                                if(value > 1 && value < 0){
                                     throw std::runtime_error("Invalid boolean value for variable '" + identifier + "[" + std::to_string(i) + "]'. Expected true or false.");
                                 }
-                                currentScope->arrays[identifier][i] = Value(value);
+                                currentScope->arrays[identifier][i] = Value(value == 1 ? true : false);;
                             }
                         } else {
                             int value = evaluate(varDecl->initializer->expression);
-                            if(value > 1){
+                            if(value > 1 && value < 0){
                                 throw std::runtime_error("Invalid boolean value for variable '" + identifier + "'. Expected true or false.");
                             }
-                            currentScope->arrays[identifier][0] = Value(value);
+                            currentScope->arrays[identifier][0] = Value(value == 1 ? true : false);
                         }
 
                     }
@@ -131,11 +130,11 @@ int SimplEvaluator::evaluate(AstNode* node) {
                         int value = evaluate(varDecl->initializer->expression);
                         currentScope->variables[identifier] = Value(value);
                     } else if (varDecl->type->type == EnumVarType::Bool) {
-                       int value = evaluate(varDecl->initializer->expression);\
-                        if(value > 1){
+                       int value = evaluate(varDecl->initializer->expression);
+                        if(value > 1 && value < 0){
                             throw std::runtime_error("Invalid boolean value for variable '" + identifier + "'. Expected true or false.");
                         }
-                        currentScope->variables[identifier] = Value(value);
+                        currentScope->variables[identifier] = Value(value == 1 ? true : false);
                     } 
                 }
                 
@@ -393,27 +392,87 @@ int SimplEvaluator::evaluate(AstNode* node) {
                 std::cout << printStmtNode->identifier << std::endl;
             } else if (printStmtNode->expression) {
                 int value = evaluate(printStmtNode->expression);
-                std::cout << value << std::endl;
+
+                if (printStmtNode->expression->kind() == NodeKind::Variable) {
+                    const auto *varNode = static_cast<const Variable *>(printStmtNode->expression);
+                    const std::string &identifier = varNode->name;
+
+                    auto it = currentScope->variables.find(identifier);
+                    if (it != currentScope->variables.end() && it->second.has_value()) {
+                        Value varValue = it->second.value();
+                        if (varValue.type == Value::Int) {
+                            std::cout << varValue.intVal << std::endl;
+                        } else if (varValue.type == Value::Bool) {
+                            std::cout << (varValue.boolVal ? "true" : "false") << std::endl;
+                        }
+                    } else {
+                        throw std::runtime_error("Variable '" + identifier + "' is not initialized.");
+                    }
+
+                }else if (printStmtNode->expression->kind() == NodeKind::ArrayVariable) {
+                    const auto *arrayVarNode = static_cast<const ArrayVariable *>(printStmtNode->expression);
+                    const std::string &identifier = arrayVarNode->name;
+                    AstNode *indexExpr = arrayVarNode->indexExpr;
+                    auto it = currentScope->arrays.find(identifier);
+                    
+                    if (it != currentScope->arrays.end()) {
+                        int index = evaluate(indexExpr);
+                        Value arrayValue = it->second[index].value();
+                        if (arrayValue.type == Value::Int) {
+                            std::cout << arrayValue.intVal << std::endl;
+                        } else if (arrayValue.type == Value::Bool) {
+                            std::cout << (arrayValue.boolVal ? "true" : "false") << std::endl;
+                        }
+                    } else {
+                        throw std::runtime_error("Array variable '" + identifier + "' is not initialized.");
+                    }
+                }else{
+                    std::cout << value << std::endl;
+                }
+              
             } else {
                 throw std::runtime_error("Print statement has no expression or identifier.");
             }
             return 0;
         }
-        case NodeKind::AssignmentValues:{
+       case NodeKind::AssignmentValues: {
             const auto *assignNode = static_cast<const AssignStament *>(node);
-            int value = evaluate(assignNode->expr);
+            Value assignValue = evaluate(assignNode->expr);
 
             if(assignNode->isArray) {
                 if (assignNode->index) {
                     if (!isVariableDefined(assignNode->identifier)) {
                         throw std::runtime_error("array '" + assignNode->identifier + "' is not defined.");
                     }
+                    
                     int index = evaluate(assignNode->index);
-                    if (index < 0 || index >= currentScope->arrays[assignNode->identifier].size()) {
+                    auto& array = currentScope->arrays[assignNode->identifier];
+                    
+                    if (index < 0 || index >= array.size()) {
                         throw std::runtime_error("Index out of bounds for array variable '" + assignNode->identifier + "'.");
                     }
-                    currentScope->arrays[assignNode->identifier][index] = Value(value);
+
+                    // Check type compatibility with first element's type
+                    if (array[0].has_value()) {
+                        Value firstElement = array[0].value();
+                       
+                        int value = assignValue.intVal;
+                        // Additional check for boolean arrays
+                        if (firstElement.type == Value::Bool) {
+                          
+                            if (value != 0 && value != 1) {
+                                throw std::runtime_error("Invalid boolean value for array '" + 
+                                    assignNode->identifier + "'. Expected 0 or 1.");
+                            }
+                            // Convert to proper boolean
+                            assignValue = Value(value == 1);
+                        }else{
+                           assignValue = Value(value);
+                        }
+                    }
+                    currentScope->arrays[assignNode->identifier][index] = assignValue;
                     
+
                 } else {
                     throw std::runtime_error("Array assignment requires an index.");
                 }
@@ -421,10 +480,29 @@ int SimplEvaluator::evaluate(AstNode* node) {
                 if (!isVariableDefined(assignNode->identifier)) {
                     throw std::runtime_error("Variable '" + assignNode->identifier + "' is not defined.");
                 }
-                currentScope->variables[assignNode->identifier] = Value(value);
+
+                auto it = currentScope->variables.find(assignNode->identifier);
+                if (it != currentScope->variables.end() && it->second.has_value()) {
+                    Value currentValue = it->second.value();
+
+                }
+                
+                if(it->second->type == Value::Bool) {
+                    int value = assignValue.intVal;
+
+                    if (value != 0 && value != 1) {
+                        throw std::runtime_error("Invalid boolean value for array '" + 
+                            assignNode->identifier + "'. Expected 0 or 1.");
+                    }
+                    assignValue = Value(value == 1);
+
+                } else if(it->second->type == Value::Int) {
+                    assignValue = Value(assignValue.intVal);
+                }
+                currentScope->variables[assignNode->identifier] = assignValue;
             }
-           
-            return value;
+            
+            return assignValue.type == Value::Int ? assignValue.intVal : assignValue.boolVal;
         }
         case NodeKind::Statements:{
             const auto *statements= static_cast<const statementsNode *>(node);
@@ -495,20 +573,23 @@ int SimplEvaluator::evaluate(AstNode* node) {
         case NodeKind::ifStatement: {
             const auto *ifNode = static_cast<const IfStatement *>(node);
             if (evaluate(ifNode->condition)) {
-                return evaluate(ifNode->statements);
+                evaluate(ifNode->statements);
+                return 1;
             }
             return 0;
         }
         case NodeKind::elseIfStatement: {
             const auto *elseIfNode = static_cast<const ElseIfStatement *>(node);
             if (evaluate(elseIfNode->condition)) {
-                return evaluate(elseIfNode->statements);
+                evaluate(elseIfNode->statements);
+                return 1;
             }
             return 0;
         }
         case NodeKind::elseStatement: {
             const auto *elseNode = static_cast<const ElseStatement *>(node);
-            return evaluate(elseNode->statements);
+            int value = evaluate(elseNode->statements);
+            return 1; // Return a non-zero value to indicate the else block was executed
         }
         case NodeKind::ReadFunctions: {
             int value;

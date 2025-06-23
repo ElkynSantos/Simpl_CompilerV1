@@ -24,7 +24,6 @@ struct Scope {
 class SimplEvaluator {
     public:
     SimplEvaluator() {
-        // Initialize global scope
         currentScope = new Scope();
         varsByFunctions["global"] = currentScope;
     }
