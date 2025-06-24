@@ -173,19 +173,19 @@ int SimplEvaluator::evaluate(AstNode* node) {
             const auto *equalBooleanNode = static_cast<const EqualBoolean *>(node);
             return evaluate(equalBooleanNode->left) == evaluate(equalBooleanNode->right);
         }
-        case NodeKind::NEqualBoolean:
+        case NodeKind::NotEqualBoolean:
         {
-            const auto *nEqualBooleanNode = static_cast<const NEqualBoolean *>(node);
+            const auto *nEqualBooleanNode = static_cast<const NotEqualBoolean *>(node);
             return evaluate(nEqualBooleanNode->left) != evaluate(nEqualBooleanNode->right);
         }
-        case NodeKind::Less_ThanBoolean:
+        case NodeKind::LessThanBoolean:
         {
-            const auto *lessThanBooleanNode = static_cast<const Less_ThanBoolean *>(node);
+            const auto *lessThanBooleanNode = static_cast<const LessThanBoolean *>(node);
             return evaluate(lessThanBooleanNode->left) < evaluate(lessThanBooleanNode->right);
         }
-        case NodeKind::Greater_ThanBoolean:
+        case NodeKind::GreaterThanBoolean:
         {
-            const auto *greaterThanBooleanNode = static_cast<const Greater_ThanBoolean *>(node);
+            const auto *greaterThanBooleanNode = static_cast<const GreaterThanBoolean *>(node);
             return evaluate(greaterThanBooleanNode->left) > evaluate(greaterThanBooleanNode->right);
         }
         case NodeKind::LessEqualBoolean:

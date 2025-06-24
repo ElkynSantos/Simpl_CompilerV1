@@ -16,9 +16,9 @@ class Initializer;
 class UnaryExpr;
 class BinaryExpr;
 class EqualBoolean;
-class NEqualBoolean;
-class Less_ThanBoolean;
-class Greater_ThanBoolean;
+class NotEqualBoolean;
+class LessThanBoolean;
+class GreaterThanBoolean;
 class LessEqualBoolean;
 class GreaterEqualBoolean;
 class UnaryNotBoolean;
@@ -87,9 +87,9 @@ enum class NodeKind{
     forStatement,
     AssignmentValues,
     EqualBoolean,
-    NEqualBoolean,
-    Less_ThanBoolean,
-    Greater_ThanBoolean,
+    NotEqualBoolean,
+    LessThanBoolean,
+    GreaterThanBoolean,
     LessEqualBoolean,
     GreaterEqualBoolean,
     OrBoolean,
@@ -488,41 +488,41 @@ public:
   std::string toString() const override;
 };
 
-class NEqualBoolean : public BinaryExpr
+class NotEqualBoolean : public BinaryExpr
 {
 
 public:
-  NEqualBoolean(AstNode *left, AstNode *right) : BinaryExpr(left, right) {}
+  NotEqualBoolean(AstNode *left, AstNode *right) : BinaryExpr(left, right) {}
 
   NodeKind kind() const override
   {
-    return NodeKind::NEqualBoolean;
+    return NodeKind::NotEqualBoolean;
   }
 
   std::string toString() const override;
 };
 
-class Less_ThanBoolean : public BinaryExpr
+class LessThanBoolean : public BinaryExpr
 {
 public:
-  Less_ThanBoolean(AstNode *left, AstNode *right) : BinaryExpr(left, right) {}
+  LessThanBoolean(AstNode *left, AstNode *right) : BinaryExpr(left, right) {}
 
   NodeKind kind() const override
   {
-    return NodeKind::Less_ThanBoolean;
+    return NodeKind::LessThanBoolean;
   }
 
   std::string toString() const override;
 };
 
-class Greater_ThanBoolean : public BinaryExpr
+class GreaterThanBoolean : public BinaryExpr
 {
 public:
-  Greater_ThanBoolean(AstNode *left, AstNode *right) : BinaryExpr(left, right) {}
+  GreaterThanBoolean(AstNode *left, AstNode *right) : BinaryExpr(left, right) {}
 
   NodeKind kind() const override
   {
-    return NodeKind::Greater_ThanBoolean;
+    return NodeKind::GreaterThanBoolean;
   }
 
   std::string toString() const override;
@@ -736,17 +736,17 @@ public:
 
 class Variable : public AstNode
 {
-public:
-  Variable(const std::string &name) : name(name) {}
+  public:
+    Variable(const std::string &name) : name(name) {}
 
-  NodeKind kind() const override
-  {
-    return NodeKind::Variable;
-  }
+    NodeKind kind() const override
+    {
+      return NodeKind::Variable;
+    }
 
-  std::string toString() const override;
+    std::string toString() const override;
 
-  std::string name;
+    std::string name;
 };
 
 class ArrayVariable : public AstNode

@@ -212,17 +212,17 @@ std::string EqualBoolean::toString() const
     return "(" + left->toString() + " == " + right->toString() + ")";
 }
 
-std::string NEqualBoolean::toString() const
+std::string NotEqualBoolean::toString() const
 {
     return "(" + left->toString() + " != " + right->toString() + ")";
 }
 
-std::string Less_ThanBoolean::toString() const
+std::string LessThanBoolean::toString() const
 {
     return "(" + left->toString() + " < " + right->toString() + ")";
 }
 
-std::string Greater_ThanBoolean::toString() const
+std::string GreaterThanBoolean::toString() const
 {
     return "(" + left->toString() + " > " + right->toString() + ")";
 }

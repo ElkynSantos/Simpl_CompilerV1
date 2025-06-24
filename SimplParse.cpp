@@ -710,13 +710,13 @@ AstNode* SimplParser::relationalExpression() {
             case Token::Equal:
                 return new EqualBoolean(left, right);
             case Token::NotEqual:
-                return new NEqualBoolean(left, right);
+                return new NotEqualBoolean(left, right);
             case Token::LessThan:
-                return new Less_ThanBoolean(left, right);
+                return new LessThanBoolean(left, right);
             case Token::LessThanOrEqualTo:
                 return new LessEqualBoolean(left, right);
             case Token::GreaterThan:
-                return new Greater_ThanBoolean(left, right);
+                return new GreaterThanBoolean(left, right);
             case Token::GreaterThanOrEqualTo:
                 return new GreaterEqualBoolean(left, right);
             default:
