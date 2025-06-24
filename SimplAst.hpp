@@ -185,8 +185,8 @@ class statementsNode : public AstNode
 class AssignStament: public AstNode
 {
 public:
-  AssignStament(const std::string &identifier, sizeExpressionNode* index, Initializer *expr, bool isArray)
-      : identifier(identifier), index(index), expr(expr), isArray(isArray){}
+  AssignStament(const std::string &identifier, sizeExpressionNode* index, Initializer *expr, bool isArray, bool isCompleteArray = false)
+      : identifier(identifier), index(index), expr(expr), isArray(isArray), isCompleteArray(isCompleteArray){}
 
   NodeKind kind() const override
   {
@@ -199,6 +199,7 @@ public:
   sizeExpressionNode *index;
   Initializer *expr;
   bool isArray = false;
+  bool isCompleteArray = false; // Indicates if the assignment is for a complete array initialization
 };
 
 class ReturnStatement : public AstNode

@@ -386,12 +386,30 @@ AstNode* SimplParser::assignmentValues(){
 
         if(currentToken == Token::Assignment) {
             currentToken = lexer.getNextToken();
-            AstNode* express = expression();
-            if(currentToken != Token::Semicolon) {
-                throwError({Token::Semicolon});
+            if(currentToken == Token::BracketLeft) {
+                isArray = false;
+                const bool completeArray = true;
+                currentToken = lexer.getNextToken();
+                std::vector<AstNode*> arrayExpressions = arrayinitializer();
+                if(currentToken != Token::BracketRight) {
+                    throwError({Token::BracketRight});
+                }
+                currentToken = lexer.getNextToken();
+                if(currentToken != Token::Semicolon) {
+                    throwError({Token::Semicolon});
+                }
+                currentToken = lexer.getNextToken();
+                return new AssignStament(identifier, index, new Initializer(arrayExpressions), isArray,completeArray);
+            }else{
+                AstNode* express = expression();
+                if(currentToken != Token::Semicolon) {
+                    throwError({Token::Semicolon});
+                }
+                currentToken = lexer.getNextToken();
+                return new AssignStament(identifier, index, new Initializer(express), isArray);
+
             }
-            currentToken = lexer.getNextToken();
-            return new AssignStament(identifier, index, new Initializer(express), isArray);
+            
  
         }
 

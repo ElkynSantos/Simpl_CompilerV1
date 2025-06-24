@@ -32,6 +32,8 @@ class SimplEvaluator {
     std::unordered_map<std::string, std::vector<std::optional<Value>>> arrays;
     std::unordered_map<std::string, std::optional<Value>> variablesRef;
     std::unordered_map<std::string, std::vector<std::optional<Value>>> arraysRef;
+    void restoreReferences(const FunctionCall* callNode, 
+                          const GlobalFnDeclareNode* fnDecl);
     
 
 };

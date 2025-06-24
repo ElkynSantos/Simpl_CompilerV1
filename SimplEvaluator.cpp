@@ -379,24 +379,7 @@ int SimplEvaluator::evaluate(AstNode* node) {
             variables = previousVariables;
             arrays = previousArrays;
 
-            for (size_t i = 0; i < callNode->args.size(); ++i) {
-                const auto* paramDecl = static_cast<const Parameter*>(fnDecl->parameters->parameterList[i]);
-                const auto* argNode = callNode->args[i];
-
-                if (paramDecl->isRef && argNode->expression->kind() == NodeKind::Variable) {
-                    const auto* varNode = static_cast<const Variable*>(argNode->expression);
-                    
-                    if (variables.find(varNode->name) != variables.end()) {
-                        variables[varNode->name] = variablesRef[paramDecl->identifier];
-                    }
-                    else if (arrays.find(varNode->name) != arrays.end()) {
-                        arrays[varNode->name] = arraysRef[paramDecl->identifier];
-                    }
-                }
-            }
-
-            variablesRef.clear();
-            arraysRef.clear();
+            restoreReferences(callNode, fnDecl);
             
             return result.intVal;
         }
@@ -478,8 +461,8 @@ int SimplEvaluator::evaluate(AstNode* node) {
        case NodeKind::AssignmentValues: {
             const auto *assignNode = static_cast<const AssignStament *>(node);
             Value assignValue = evaluate(assignNode->expr);
-
             if(assignNode->isArray) {
+
                 if (assignNode->index) {
                     if (!isVariableDefined(assignNode->identifier)) {
                         throw std::runtime_error("array '" + assignNode->identifier + "' is not defined.");
@@ -516,7 +499,22 @@ int SimplEvaluator::evaluate(AstNode* node) {
                 } else {
                     throw std::runtime_error("Array assignment requires an index.");
                 }
-            } else {
+            }else if(assignNode->isCompleteArray) {
+
+                if (!isVariableDefined(assignNode->identifier)) {
+                    throw std::runtime_error("Array '" + assignNode->identifier + "' is not defined.");
+                }
+                const auto &arrayValues = assignNode->expr->arrayExpressions;
+                if( arrayValues.size() > arrays[assignNode->identifier].size()) {
+                    throw std::runtime_error("Initializer array size exceeds declared size for variable '" + assignNode->identifier + "'.");
+                }
+                for (size_t i = 0; i < arrayValues.size(); ++i) {
+                    int value = evaluate(arrayValues[i]);
+                    arrays[assignNode->identifier][i] = Value(value);
+                }
+               
+            }
+            else {
                 if (!isVariableDefined(assignNode->identifier)) {
                     throw std::runtime_error("Variable '" + assignNode->identifier + "' is not defined.");
                 }
@@ -534,7 +532,6 @@ int SimplEvaluator::evaluate(AstNode* node) {
                         throw std::runtime_error("Invalid boolean value for array '" + 
                             assignNode->identifier + "'. Expected 0 or 1.");
                     }
-                    std::cout << "Assigning boolean value to variable: " << assignNode->identifier << std::endl;
                     assignValue = Value(value == 1);
 
                 } else if(it->second->type == Value::Int) {
@@ -543,7 +540,7 @@ int SimplEvaluator::evaluate(AstNode* node) {
                 variables[assignNode->identifier] = assignValue;
             }
             
-            return assignValue.type == Value::Int ? assignValue.intVal : assignValue.boolVal;
+            return !assignNode->isCompleteArray ? assignValue.type == Value::Int ? assignValue.intVal : assignValue.boolVal : 0;
         }
         case NodeKind::Statements:{
             const auto *statements= static_cast<const statementsNode *>(node);
@@ -670,9 +667,6 @@ int SimplEvaluator::evaluate(AstNode* node) {
     }
 }
 
-
-
-
 bool SimplEvaluator::isVariableDefined(const std::string& identifier) const {
     if (variables.find(identifier) !=variables.end() ||
         arrays.find(identifier) != arrays.end()) {
@@ -681,4 +675,26 @@ bool SimplEvaluator::isVariableDefined(const std::string& identifier) const {
 
 
     return false;
+}
+
+void SimplEvaluator::restoreReferences(const FunctionCall* callNode, 
+                                     const GlobalFnDeclareNode* fnDecl) {
+    for (size_t i = 0; i < callNode->args.size(); ++i) {
+        const auto* paramDecl = static_cast<const Parameter*>(fnDecl->parameters->parameterList[i]);
+        const auto* argNode = callNode->args[i];
+
+        if (paramDecl->isRef && argNode->expression->kind() == NodeKind::Variable) {
+            const auto* varNode = static_cast<const Variable*>(argNode->expression);
+            
+            if (variables.find(varNode->name) != variables.end()) {
+                variables[varNode->name] = variablesRef[paramDecl->identifier];
+            }
+            else if (arrays.find(varNode->name) != arrays.end()) {
+                arrays[varNode->name] = arraysRef[paramDecl->identifier];
+            }
+        }
+    }
+
+    variablesRef.clear();
+    arraysRef.clear();
 }
