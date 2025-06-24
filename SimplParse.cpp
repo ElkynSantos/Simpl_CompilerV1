@@ -540,6 +540,10 @@ AstNode* SimplParser::loop() {
             throwError({Token::ParenthesisLeft});
         }
         currentToken = lexer.getNextToken();
+        if(currentToken != Token::Ident && currentToken != Token::Number && currentToken != Token::ParenthesisLeft && 
+        currentToken != Token::KwNot) {
+            throwError({Token::Ident, Token::Number, Token::ParenthesisLeft, Token::KwNot});
+        }
         AstNode* express = expression();
         if (currentToken != Token::ParenthesisRight) {
             throwError({Token::ParenthesisRight});
@@ -577,19 +581,29 @@ AstNode* SimplParser::loop() {
             throwError({Token::Assignment});
         }
         currentToken = lexer.getNextToken();
+        if(currentToken != Token::Ident && currentToken != Token::Number && currentToken != Token::ParenthesisLeft) {
+            throwError({Token::Ident, Token::Number, Token::ParenthesisLeft});
+        }
 
         AstNode* startExpress = expression();
-
+        
         if(currentToken != Token::KwTo) {
             throwError({Token::KwTo});
         }
 
+
         currentToken = lexer.getNextToken();
+        if(currentToken != Token::Ident && currentToken != Token::Number && currentToken != Token::ParenthesisLeft) {
+            throwError({Token::Ident, Token::Number, Token::ParenthesisLeft});
+        }
 
         AstNode* EndExpress = expression();
         AstNode* stepExpress = nullptr;
         if(currentToken == Token::KwStep) {
             currentToken = lexer.getNextToken();
+            if(currentToken != Token::Ident && currentToken != Token::Number && currentToken != Token::ParenthesisLeft) {
+                throwError({Token::Ident, Token::Number, Token::ParenthesisLeft});
+            }
             stepExpress = expression();
         }
 

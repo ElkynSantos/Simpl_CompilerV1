@@ -15,6 +15,7 @@ int SimplEvaluator::evaluate(AstNode* node) {
             for(auto &decl : ProgramNode->globalDeclarations) {
                 if (decl->kind() == NodeKind::GlobalFnDeclare) {
                     const auto *fnDecl = static_cast<const GlobalFnDeclareNode*>(decl);
+                    evaluate(decl);
                     methodTable[fnDecl->functionName] = fnDecl;
                 }else if(decl->kind() == NodeKind::GlobalVarDeclare) {
                     evaluate(decl);
@@ -33,6 +34,23 @@ int SimplEvaluator::evaluate(AstNode* node) {
         case NodeKind::GlobalFnDeclare:{
             const auto *fnDecl = static_cast<const GlobalFnDeclareNode*>(node);
             evaluate(fnDecl->parameters);
+
+             if (fnDecl->returnType->type == EnumFunctionType::Int || fnDecl->returnType->type  == EnumFunctionType::Bool) {
+                bool hasReturn = false;
+                const auto* stmts = static_cast<const statementsNode*>(fnDecl->functionBody);
+                
+                for (const auto* stmt : stmts->statements) {
+                    if (stmt->kind() == NodeKind::ReturnStatement) {
+                        hasReturn = true;
+                        break;
+                    }
+                }
+                
+                if (!hasReturn) {
+                    throw std::runtime_error("Function '" + fnDecl->functionName + 
+                                        "' must return a value of type int or bool");
+                }
+            }
             return 0;
         }
         case NodeKind::ParameterList:{
@@ -120,9 +138,9 @@ int SimplEvaluator::evaluate(AstNode* node) {
                 }
                 
                 if (varDecl->type->type == EnumVarType::Int) {
-                    variables[identifier] = std::nullopt;
+                    variables[identifier] = Value(0);
                 } else if (varDecl->type->type == EnumVarType::Bool) {
-                    variables[identifier] = std::nullopt;
+                    variables[identifier] = Value(false);
                 }
                 if(varDecl->initializer){
                     
@@ -516,6 +534,7 @@ int SimplEvaluator::evaluate(AstNode* node) {
                         throw std::runtime_error("Invalid boolean value for array '" + 
                             assignNode->identifier + "'. Expected 0 or 1.");
                     }
+                    std::cout << "Assigning boolean value to variable: " << assignNode->identifier << std::endl;
                     assignValue = Value(value == 1);
 
                 } else if(it->second->type == Value::Int) {

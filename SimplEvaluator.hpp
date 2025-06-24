@@ -25,9 +25,6 @@ class SimplEvaluator {
     int evaluate(AstNode* node);
 
     bool isVariableDefined(const std::string& identifier) const;
-    void enterFunctionScope(const std::string& functionName);
-    void exitFunctionScope();
-    void printScope(const std::string& scopeName = "") const;
 
     private:
     std::unordered_map<std::string, const GlobalFnDeclareNode *> methodTable;

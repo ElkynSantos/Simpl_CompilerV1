@@ -1,21 +1,21 @@
-fn swap(ref x: int, ref y: int) -> void
+fn swap(x: ref int, y: ref int) -> void
 {
     let tmp: int = x;
     x = y;
     y = tmp;
 }
 
-fn inc(ref v: int) -> void
+fn inc(v: ref int) -> void
 {
     v = v + 1;
 }
 
-fn negate(ref flag: bool) -> void
+fn negate(flag: ref bool) -> void
 {
     flag = not flag;
 }
 
-fn fill(ref arr: int[3], value: int) -> void
+fn fill(arr: ref int[3], value: int) -> void
 {
     for i = 0 to 2 {
         arr[i] = value;
