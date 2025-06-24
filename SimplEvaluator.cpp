@@ -80,6 +80,13 @@ int SimplEvaluator::evaluate(AstNode* node) {
                     throw std::runtime_error("Variable '" + identifier + "' is already defined.");
                 }
                 arrays[identifier] = std::vector<std::optional<Value>>(Sizevalue, std::nullopt);
+                for (int i = 0; i < Sizevalue; ++i) {
+                    if (varDecl->type->type == EnumVarType::Int) {
+                        arrays[identifier][i] = Value(0); // Default value for int
+                    } else if (varDecl->type->type == EnumVarType::Bool) {
+                        arrays[identifier][i] = Value(false); // Default value for bool
+                    }
+                }
                 if(varDecl -> initializer){
                     if(varDecl->type->type == EnumVarType::Int) {
                         if(varDecl->initializer->isArray) {
@@ -510,7 +517,22 @@ int SimplEvaluator::evaluate(AstNode* node) {
                 }
                 for (size_t i = 0; i < arrayValues.size(); ++i) {
                     int value = evaluate(arrayValues[i]);
-                    arrays[assignNode->identifier][i] = Value(value);
+                    if (arrays[assignNode->identifier][0].has_value()) {
+                        Value firstElement = arrays[assignNode->identifier][0].value();
+                        if (firstElement.type == Value::Bool) {
+                            if (value != 0 && value != 1) {
+                                throw std::runtime_error("Invalid boolean value for array '" + 
+                                    assignNode->identifier + "'. Expected 0 or 1.");
+                            }
+                            arrays[assignNode->identifier][i] = Value(value == 1);
+                        } else if (firstElement.type == Value::Int) {
+                            arrays[assignNode->identifier][i] = Value(value);
+                        } else {
+                            throw std::runtime_error("Unsupported type for array '" + assignNode->identifier + "'.");
+                        }
+                    } else {
+                        arrays[assignNode->identifier][i] = Value(value);
+                    }
                 }
                
             }
