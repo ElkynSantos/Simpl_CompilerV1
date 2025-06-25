@@ -121,14 +121,14 @@ int SimplEvaluator::evaluate(AstNode* node) {
                             }
                             for (size_t i = 0; i < arrayValues.size(); ++i) {
                                 int value = evaluate(arrayValues[i]);
-                                if(value > 1 && value < 0){
+                                if(value != 1 && value != 0){
                                     throw std::runtime_error("Invalid boolean value for variable '" + identifier + "[" + std::to_string(i) + "]'. Expected true or false.");
                                 }
                                 arrays[identifier][i] = Value(value == 1 ? true : false);;
                             }
                         } else {
                             int value = evaluate(varDecl->initializer->expression);
-                            if(value > 1 && value < 0){
+                            if(value != 1 && value != 0){
                                 throw std::runtime_error("Invalid boolean value for variable '" + identifier + "'. Expected true or false.");
                             }
                             arrays[identifier][0] = Value(value == 1 ? true : false);
@@ -156,7 +156,8 @@ int SimplEvaluator::evaluate(AstNode* node) {
                         variables[identifier] = Value(value);
                     } else if (varDecl->type->type == EnumVarType::Bool) {
                        int value = evaluate(varDecl->initializer->expression);
-                        if(value > 1 && value < 0){
+
+                        if(value != 1 && value != 0){
                             throw std::runtime_error("Invalid boolean value for variable '" + identifier + "'. Expected true or false.");
                         }
                         variables[identifier] = Value(value == 1 ? true : false);
@@ -546,7 +547,6 @@ int SimplEvaluator::evaluate(AstNode* node) {
                     Value currentValue = it->second.value();
 
                 }
-                
                 if(it->second->type == Value::Bool) {
                     int value = assignValue.intVal;
 
@@ -650,10 +650,24 @@ int SimplEvaluator::evaluate(AstNode* node) {
             int value = evaluate(elseNode->statements);
             return value;
         }
-        case NodeKind::ReadFunctions: {
-            int value;
-            std::cin >> value;
-            return value;
+       case NodeKind::ReadFunctions: {
+            std::string input;
+            std::cin >> input;
+            
+            // Check for boolean input
+            if (input == "true") {
+                return 1;  // true = 1
+            }
+            if (input == "false") {
+                return 0;  // false = 0
+            }
+            
+            // Try numeric conversion
+            try {
+                return std::stoi(input);
+            } catch (const std::exception& e) {
+                throw std::runtime_error("Invalid input: must be number or boolean");
+            }
         }
         case NodeKind::TypeNameNode: {
             const auto *typeNode = static_cast<const TypeNameNode *>(node);
