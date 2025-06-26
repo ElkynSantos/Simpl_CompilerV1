@@ -86,18 +86,21 @@ Token SimplLexer::getNextToken() {
     text.clear();
 
     /*!fa2lexer
-     %generate.lexer (text);
-     */
+    %generate.lexer (text);
+    */
 }
 
 std::string SimplLexer::tokenToString(Token tk)
 {
+
    /*!fa2lexer
    %generate.toString (tk);
    */
+
 }
 
 void SimplLexer::initKeywords() {
+
     keywords["if"] = Token::KwIf;
     keywords["else"] = Token::KwElse;
     keywords["while"] = Token::KwWhile;
@@ -123,9 +126,11 @@ void SimplLexer::initKeywords() {
 }
 
 std::optional<Token> SimplLexer :: keywordToken(const std::string& text) {
+    
     auto Token = keywords.find(text);
     if (Token != keywords.end()) {
         return Token->second;
     }
     return std::nullopt;
+
 }
