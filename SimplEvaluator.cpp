@@ -82,9 +82,9 @@ int SimplEvaluator::evaluate(AstNode* node) {
                 arrays[identifier] = std::vector<std::optional<Value>>(Sizevalue, std::nullopt);
                 for (int i = 0; i < Sizevalue; ++i) {
                     if (varDecl->type->type == EnumVarType::Int) {
-                        arrays[identifier][i] = Value(0); // Default value for int
+                        arrays[identifier][i] = Value(0);
                     } else if (varDecl->type->type == EnumVarType::Bool) {
-                        arrays[identifier][i] = Value(false); // Default value for bool
+                        arrays[identifier][i] = Value(false);
                     }
                 }
                 if(varDecl -> initializer){
@@ -483,19 +483,16 @@ int SimplEvaluator::evaluate(AstNode* node) {
                         throw std::runtime_error("Index out of bounds for array variable '" + assignNode->identifier + "'.");
                     }
 
-                    // Check type compatibility with first element's type
                     if (array[0].has_value()) {
                         Value firstElement = array[0].value();
                        
                         int value = assignValue.intVal;
-                        // Additional check for boolean arrays
                         if (firstElement.type == Value::Bool) {
                           
                             if (value != 0 && value != 1) {
                                 throw std::runtime_error("Invalid boolean value for array '" + 
                                     assignNode->identifier + "'. Expected 0 or 1.");
                             }
-                            // Convert to proper boolean
                             assignValue = Value(value == 1);
                         }else{
                            assignValue = Value(value);
@@ -654,15 +651,13 @@ int SimplEvaluator::evaluate(AstNode* node) {
             std::string input;
             std::cin >> input;
             
-            // Check for boolean input
             if (input == "true") {
-                return 1;  // true = 1
+                return 1;
             }
             if (input == "false") {
-                return 0;  // false = 0
+                return 0; 
             }
             
-            // Try numeric conversion
             try {
                 return std::stoi(input);
             } catch (const std::exception& e) {

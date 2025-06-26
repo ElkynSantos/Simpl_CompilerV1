@@ -199,7 +199,7 @@ public:
   sizeExpressionNode *index;
   Initializer *expr;
   bool isArray = false;
-  bool isCompleteArray = false; // Indicates if the assignment is for a complete array initialization
+  bool isCompleteArray = false;
 };
 
 class ReturnStatement : public AstNode
