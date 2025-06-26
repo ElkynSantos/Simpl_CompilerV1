@@ -126,14 +126,12 @@ GlobalFnDeclareNode* SimplParser::globalFnDeclare() {
     if (currentToken == Token::KwFn) {
         currentToken = lexer.getNextToken();
 
-        // Capturar nombre de función
         if (currentToken != Token::Ident) {
             throwError({Token::Ident});
         }
         std::string functionName = lexer.text;
         currentToken = lexer.getNextToken();
 
-        // Capturar parámetros
         if (currentToken != Token::ParenthesisLeft) {
             throwError({Token::ParenthesisLeft});
         }
@@ -144,14 +142,12 @@ GlobalFnDeclareNode* SimplParser::globalFnDeclare() {
         }
         currentToken = lexer.getNextToken();
 
-        // Capturar tipo de retorno
         if (currentToken != Token::AssignmentFunction) {
             throwError({Token::AssignmentFunction});
         }
         currentToken = lexer.getNextToken();
         TypeNameFunctionNode* returnType = functionTypes();
 
-        // Capturar cuerpo de función
         if(currentToken != Token::KeyLeft) {
             throwError({Token::KeyLeft});
         }
