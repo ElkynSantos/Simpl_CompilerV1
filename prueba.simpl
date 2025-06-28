@@ -1,13 +1,48 @@
+fn swap(x: ref int, y: ref int) -> void
+{
+    let tmp: int = x;
+    x = y;
+    y = tmp;
+}
+
+fn inc(v: ref int) -> void
+{
+    v = v + 1;
+}
+
+fn negate(flag: ref bool) -> void
+{
+    flag = not flag;
+}
+
+fn fill(arr: ref int[3], value: int) -> void
+{
+    for i = 0 to 2 {
+        arr[i] = value;
+    }
+}
+
 fn main() -> int
 {
-    let nums: int[3];
-    nums = [3,7,8];
-    print(nums[0]); print(nums[1]); print(nums[2]); // 1 2 3
-    print("Hola mundo");                                 // 4
+    let p: int = 5;
+    let q: int = 10;
+    let ok: bool = false;
+    let data: int[3];
 
-    nums[1] = nums[0] + nums[2];   
-    print("Ingrese bool");                                 // 4
-    let x: bool = readBool();
-    print(x);
+    swap(ref p, ref q);
+    inc(ref p);
+    print(p);
+    print(q);
+
+    negate(ref ok);
+    print(ok);
+
+    fill(ref data, 7);
+
+    print(data[0]);
+    print(data[1]);
+    print(data[2]);
+
     return 0;
 }
+// Expected output sequence: 11 5 true 7 7 7
