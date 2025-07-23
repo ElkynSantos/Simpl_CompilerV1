@@ -19,21 +19,20 @@ struct Value {
 
 class SimplEvaluator {
     public:
-    SimplEvaluator() {}
-    
-    ~SimplEvaluator() = default;
-    int evaluate(AstNode* node);
+        SimplEvaluator() {}
+        ~SimplEvaluator() = default;
 
-    bool isVariableDefined(const std::string& identifier) const;
+        int evaluate(AstNode* node);
+        bool isVariableDefined(const std::string& identifier) const;
 
     private:
-    std::unordered_map<std::string, const GlobalFnDeclareNode *> methodTable;
-    std::unordered_map<std::string, std::optional<Value>> variables;
-    std::unordered_map<std::string, std::vector<std::optional<Value>>> arrays;
-    std::unordered_map<std::string, std::optional<Value>> variablesRef;
-    std::unordered_map<std::string, std::vector<std::optional<Value>>> arraysRef;
-    void restoreReferences(const FunctionCall* callNode, 
-                          const GlobalFnDeclareNode* fnDecl);
+
+        std::unordered_map<std::string, const GlobalFnDeclareNode *> methodTable;
+        std::unordered_map<std::string, std::optional<Value>> variables;
+        std::unordered_map<std::string, std::vector<std::optional<Value>>> arrays;
+        std::unordered_map<std::string, std::optional<Value>> variablesRef;
+        std::unordered_map<std::string, std::vector<std::optional<Value>>> arraysRef;
+        void restoreReferences(const FunctionCall* callNode, const GlobalFnDeclareNode* fnDecl);
     
 
 };

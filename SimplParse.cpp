@@ -8,14 +8,13 @@ programNode* SimplParser::parse() {
 
     currentToken = lexer.getNextToken();
 
-
     programNode *simplProgram = program();
 
     if (currentToken != Token::Eof)
     {
-
         throwError({Token::Eof});
     }
+
     SimplEvaluator evaluator;
     evaluator.evaluate(simplProgram);
     return simplProgram;
